@@ -87,33 +87,28 @@ body{background:var(--proto-bg);color:#171717}
 .panel,.metric-card{border:1px solid var(--proto-line);border-radius:11px;box-shadow:0 1px 2px rgba(0,0,0,.02);background:#fff}
 .primary{background:#171717}.primary:hover{background:#2a2a2a}.ghost{border-color:#cfcfcf;background:#fff;color:#222}
 
-/* Der Rechnungseditor ist jetzt die zentrale Arbeitsfläche: Eingabe links, Rechnung rechts. */
-#invoiceModal{align-items:stretch;padding:12px;background:rgba(17,24,39,.28)}
-#invoiceModal .invoice-editor{width:min(1580px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);max-height:none;border-radius:12px;padding:0;overflow:hidden;background:var(--proto-bg)}
-#invoiceModal .modal-head{padding:16px 18px;background:#fff;border-bottom:1px solid var(--proto-line);margin:0}
-#invoiceModal .modal-head h2{font-size:19px;margin:0}#invoiceModal .modal-head p{font-size:11px;margin-top:3px}
-#invoiceModal #invoiceForm{height:calc(100% - 72px);overflow:auto;display:grid;grid-template-columns:minmax(590px,1fr) minmax(470px,560px);column-gap:18px;align-content:start;padding:16px 18px 20px}
-#invoiceModal #invoiceForm>*{grid-column:1;min-width:0}
-#invoiceModal .live-preview-pane{grid-column:2;grid-row:1 / span 30;position:sticky;top:0;align-self:start;min-width:0}
-.live-preview-head{height:30px;display:flex;justify-content:space-between;align-items:center;font-size:13px}.live-preview-head span{font-size:10px;color:#777;font-weight:400}
-.live-preview-scroll{height:calc(100vh - 145px);overflow:auto;padding:0 8px 18px 0}
-#invoiceModal .live-paper{width:100%;min-height:0;aspect-ratio:210/297;padding:8.5% 8% 17%;box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:8px;transform-origin:top center}
-#invoiceModal .live-paper .company{font-size:7.5px;line-height:1.45}#invoiceModal .live-paper .company strong{font-size:8px}
-#invoiceModal .live-paper .invoice-logo{width:34%;max-height:13%;margin-top:-2%}
-#invoiceModal .live-paper .recipient{margin-top:7%;font-size:8px;line-height:1.4}
-#invoiceModal .live-paper .inv-title{margin-top:6%;align-items:flex-start}#invoiceModal .live-paper h1{font-size:18px}
-#invoiceModal .live-paper .project-line{font-size:8px;margin-top:2px}#invoiceModal .live-paper .meta{font-size:7px;line-height:1.55}
-#invoiceModal .live-paper .paper-intro{margin-top:5%;font-size:7.5px;line-height:1.45}
-#invoiceModal .live-paper table{margin-top:4%;font-size:7px}#invoiceModal .live-paper th,#invoiceModal .live-paper td{font-size:7px;padding:5px 3px}#invoiceModal .live-paper th{font-size:6px}
-#invoiceModal .live-paper .paper-total{width:45%;margin-top:3%;font-size:7px}#invoiceModal .live-paper .paper-total div{padding:2px 0}#invoiceModal .live-paper .paper-total .grand{font-size:8px;padding-top:4px}
-#invoiceModal .live-paper .paper-prepaid-title,#invoiceModal .live-paper .paper-prepaid{font-size:6.3px}
-#invoiceModal .live-paper .footer-note{margin-top:6%;font-size:7px;line-height:1.45}
-#invoiceModal .live-paper .paper-office-footer{left:8%;right:8%;bottom:4.5%;gap:3%;font-size:5.1px;line-height:1.35}
-#invoiceModal .form-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}#invoiceModal label{font-size:11px}#invoiceModal input,#invoiceModal select,#invoiceModal textarea{padding:8px 9px;font-size:12px;border-radius:7px}
-#invoiceModal .intro-builder,#invoiceModal .prepaid-section,#invoiceModal .items-wrap,#invoiceModal .totals{border-radius:10px}
-#invoiceModal .intro-builder{padding:13px}#invoiceModal .items-head{padding:12px}#invoiceModal .item-row{padding:8px 10px;gap:7px;grid-template-columns:minmax(220px,2.4fr) .55fr .65fr .8fr .8fr 34px}
-#invoiceModal .invoice-bottom{gap:16px;margin-top:16px;grid-template-columns:1fr 300px}#invoiceModal .modal-actions{margin-top:14px;padding-bottom:2px}
-#invoiceModal .export-message{margin-top:10px}
+/* 0.7.5: Rechnungseditor wieder als reine Eingabemaske.
+   Die Vorschau wird ausschließlich über „Vorschau / Drucken“ geöffnet. */
+#invoiceModal{align-items:flex-start;padding:34px;background:rgba(15,23,42,.55)}
+#invoiceModal .invoice-editor{width:min(1180px,100%);max-width:1180px;min-height:600px;height:auto;max-height:none;border-radius:20px;padding:26px;overflow:visible;background:#fff;position:relative}
+#invoiceModal .modal-head{padding:0;margin-bottom:22px;background:transparent;border:0}
+#invoiceModal #invoiceForm{height:auto;overflow:visible;display:block;padding:0}
+#invoiceModal .form-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+#invoiceModal label{font-size:13px}
+#invoiceModal input,#invoiceModal select,#invoiceModal textarea{padding:11px 12px;font-size:inherit;border-radius:10px}
+#invoiceModal .intro-builder,#invoiceModal .prepaid-section,#invoiceModal .items-wrap,#invoiceModal .totals{border-radius:14px}
+#invoiceModal .intro-builder{padding:16px}
+#invoiceModal .items-head{padding:15px 16px}
+#invoiceModal .item-row{padding:10px 12px;gap:10px;grid-template-columns:minmax(260px,2.4fr) .55fr .65fr .8fr .8fr 42px}
+#invoiceModal .invoice-bottom{gap:30px;margin-top:24px;grid-template-columns:1fr 360px}
+#invoiceModal .modal-actions{margin-top:24px;padding-bottom:0}
+#invoiceModal .export-message{margin-top:12px}
+@media(max-width:900px){#invoiceModal .form-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}#invoiceModal .invoice-bottom{grid-template-columns:1fr}#invoiceModal .item-row{grid-template-columns:1.7fr .55fr .65fr .8fr .8fr 36px}}
 
-@media(max-width:1150px){#invoiceModal #invoiceForm{grid-template-columns:1fr}.live-preview-pane{display:none!important}}
-@media print{#invoiceModal .live-preview-pane{display:none!important}}
+
+
+/* 0.7.6 – Vorschau strikt nur per Button. Verhindert jede Überdeckung des Rechnungseditors. */
+#previewModal{display:none!important}
+#previewModal.preview-active{display:flex!important}
+#previewModal.open{display:none!important}
+#previewModal.open.preview-active{display:flex!important}
