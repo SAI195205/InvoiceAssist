@@ -19,9 +19,7 @@ function money(n){return Number(n||0).toLocaleString('de-DE',{style:'currency',c
 function deDate(v){return v?new Date(v+'T12:00:00').toLocaleDateString('de-DE'):''}
 
 async function createInvoicePdf(d){
-  // 0.6.6: PDF/A-3B wird bereits im Basis-PDF durch PDFKit aktiviert.
-  // PDFKit bettet die verwendeten TrueType-Schriften ein und erzeugt PDF 1.7 mit
-  // PDF/A-3b-Subset. Factur-X ergänzt anschließend XMP, XML und den sRGB-OutputIntent.
+  // PDF/A-3B Basis-PDF. Die E-Rechnungs-/XML-Logik bleibt unverändert.
   const windir=process.env.WINDIR||'C:\\Windows';
   const fontDir=path.join(windir,'Fonts');
   const candidates=[
@@ -35,166 +33,150 @@ async function createInvoicePdf(d){
   return await new Promise((resolve,reject)=>{
     const chunks=[];
     const doc=new PDFDocument({
-      size:'A4',
-      margins:{top:51,bottom:57,left:51,right:51},
-      autoFirstPage:true,
-      pdfVersion:'1.7',
-      subset:'PDF/A-3b',
+      size:'A4',margins:{top:51,bottom:57,left:51,right:51},autoFirstPage:true,
+      pdfVersion:'1.7',subset:'PDF/A-3b',bufferPages:true,
       info:{Title:`Rechnung ${d.invoice.number}`,Author:d.seller.name,Creator:'InvoiceAssist'}
     });
-    doc.on('data',c=>chunks.push(c));
-    doc.on('end',()=>resolve(Buffer.concat(chunks)));
-    doc.on('error',reject);
+    doc.on('data',c=>chunks.push(c));doc.on('end',()=>resolve(Buffer.concat(chunks)));doc.on('error',reject);
+    doc.registerFont('IA-Regular',regularFont);doc.registerFont('IA-Bold',boldFont);
 
-    doc.registerFont('IA-Regular',regularFont);
-    doc.registerFont('IA-Bold',boldFont);
-    const W=doc.page.width, L=51, R=W-51, contentW=R-L;
-    const dark='#151922', muted='#5f6672', light='#d9dde3', lighter='#e8eaee';
-    const text=(v)=>String(v??'');
-    const fit=(v,max=80)=>{const t=text(v); return t.length>max?t.slice(0,max-1)+'…':t};
+    const W=doc.page.width,H=doc.page.height,L=51,R=W-51,contentW=R-L;
+    const dark='#151922',muted='#5f6672',light='#d9dde3',lighter='#e8eaee';
+    const text=v=>String(v??'');
+    const setRegular=(size=9,color=dark)=>doc.font('IA-Regular').fontSize(size).fillColor(color);
+    const setBold=(size=9,color=dark)=>doc.font('IA-Bold').fontSize(size).fillColor(color);
+    const rightText=(value,x,y,w,size=9,bold=false,color=dark)=>{(bold?setBold:setRegular)(size,color);doc.text(text(value),x,y,{width:w,align:'right',lineBreak:false});};
+    const leftText=(value,x,y,w,size=9,bold=false,color=dark)=>{(bold?setBold:setRegular)(size,color);doc.text(text(value),x,y,{width:w});};
 
-    function setRegular(size=9,color=dark){doc.font('IA-Regular').fontSize(size).fillColor(color)}
-    function setBold(size=9,color=dark){doc.font('IA-Bold').fontSize(size).fillColor(color)}
-    function rightText(value,x,y,w,size=9,bold=false,color=dark){(bold?setBold:setRegular)(size,color);doc.text(text(value),x,y,{width:w,align:'right',lineBreak:false})}
-    function leftText(value,x,y,w,size=9,bold=false,color=dark){(bold?setBold:setRegular)(size,color);doc.text(text(value),x,y,{width:w})}
-
-    // 0.6.9: Das Original-Schnabel-Logo sitzt etwas kleiner im Kopfbereich oben rechts.
-    // Die E-Rechnungs-/XML- und PDF/A-Logik bleibt unverändert.
     const logoPath=path.join(__dirname,'assets','Schnabel-Logo-Schwarz.png');
+    const footerY=708;
+    const firstPageContentBottom=640; // Platz für Hinweis + feste Fußzeile auf Seite 1 reservieren
+    const otherPageContentBottom=760;
 
-    // Absender links oben
-    let y=51;
-    leftText(d.seller.name,L,y,250,11,true); y+=17;
-    leftText(d.seller.street,L,y,250,8,false,muted); y+=12;
-    leftText(`${d.seller.zip} ${d.seller.city}`.trim(),L,y,250,8,false,muted); y+=12;
-    if(d.seller.email){leftText(d.seller.email,L,y,250,8,false,muted);y+=12}
-    if(d.seller.phone){leftText(d.seller.phone,L,y,250,8,false,muted);y+=12}
-
-    // Logo rechts oben – entspricht dem im Entwurf markierten Bereich.
-    if(fsSync.existsSync(logoPath)){
-      doc.image(logoPath,R-178,40,{fit:[178,94],align:'right',valign:'top'});
+    function drawOfficeFooter(){
+      doc.moveTo(L,footerY-12).lineTo(R,footerY-12).lineWidth(0.45).strokeColor(light).stroke();
+      const gap=18,colW=(contentW-gap*2)/3,c1=L,c2=L+colW+gap,c3=L+(colW+gap)*2;
+      const footerColor='#777b82',footerSize=5.9,lineH=9.4;
+      const f=(value,x,yy,w=colW)=>{setRegular(footerSize,footerColor);doc.text(text(value),x,yy,{width:w,lineBreak:false});};
+      let fy=footerY;
+      f('dahler straße 15',c1,fy);fy+=lineH;
+      f('58809 neuenrade',c1,fy);fy+=lineH;
+      f('fon 02392 96387-0',c1,fy);fy+=lineH;
+      f('fax 02392 64686',c1,fy);fy+=lineH*1.7;
+      f('info@schnabel-architekten.de',c1,fy);fy+=lineH;
+      f('www.schnabel-architekten.de',c1,fy);
+      fy=footerY;
+      f('tom schnabel',c2,fy);fy+=lineH;f('dipl.-ing. architekt',c2,fy);fy+=lineH;
+      f('staatlich anerkannter sachverständiger',c2,fy);fy+=lineH;f('für schall- und wärmeschutz',c2,fy);fy+=lineH*1.7;
+      f('frank schnabel',c2,fy);fy+=lineH;f('dr.-ing. beratender ingenieur',c2,fy);fy+=lineH;f('statik und tragwerksplanung',c2,fy);
+      fy=footerY;
+      f('Schnabel Architekt und Beratender Ingenieur',c3,fy);fy+=lineH;f('PartG mbB',c3,fy);fy+=lineH;
+      f('Amtsgericht Essen: PR 4177',c3,fy);fy+=lineH;f('St.Nr. 302/5743/1079',c3,fy);fy+=lineH*1.7;
+      f('Vereinigte Sparkasse im Märkischen Kreis',c3,fy);fy+=lineH;f('IBAN DE19 4585 1020 0093 0123 00',c3,fy);fy+=lineH;f('BIC WELADED1PLB',c3,fy);
     }
 
-    // Empfänger
-    y=190;
-    leftText(d.buyer.name,L,y,300,9,true); y+=15;
-    leftText(d.buyer.street,L,y,300,9); y+=14;
-    leftText(`${d.buyer.zip} ${d.buyer.city}`.trim(),L,y,300,9);
+    function drawFirstPageHeader(){
+      let y=51;
+      leftText(d.seller.name,L,y,250,11,true);y+=17;
+      leftText(d.seller.street,L,y,250,8,false,muted);y+=12;
+      leftText(`${d.seller.zip} ${d.seller.city}`.trim(),L,y,250,8,false,muted);y+=12;
+      if(d.seller.email){leftText(d.seller.email,L,y,250,8,false,muted);y+=12;}
+      if(d.seller.phone){leftText(d.seller.phone,L,y,250,8,false,muted);y+=12;}
+      if(fsSync.existsSync(logoPath))doc.image(logoPath,R-168,40,{fit:[168,88],align:'right',valign:'top'});
+      y=190;leftText(d.buyer.name,L,y,300,9,true);y+=15;leftText(d.buyer.street,L,y,300,9);y+=14;leftText(`${d.buyer.zip} ${d.buyer.city}`.trim(),L,y,300,9);
+      const titleY=305;leftText(d.invoice.type||'Rechnung',L,titleY,250,23,true);if(d.invoice.project)leftText(d.invoice.project,L,titleY+34,260,10,false,'#6b7280');
+      const metaX=R-205;let my=titleY+2;
+      leftText(`Rechnungsnr.: ${d.invoice.number}`,metaX,my,205,8.5,true);my+=15;
+      leftText(`Datum: ${deDate(d.invoice.issueDate)}`,metaX,my,205,8.5);my+=15;
+      leftText(`Fällig: ${deDate(d.invoice.dueDate)}`,metaX,my,205,8.5);my+=15;
+      if(d.invoice.deliveryDate){leftText(`Leistungsdatum: ${deDate(d.invoice.deliveryDate)}`,metaX,my,205,8.5);my+=15;}
+      else if(d.invoice.periodStart&&d.invoice.periodEnd){leftText(`Leistungszeitraum: ${deDate(d.invoice.periodStart)} – ${deDate(d.invoice.periodEnd)}`,metaX,my,205,8.2);my+=15;}
+      if(d.invoice.buyerReference){leftText(`Käuferreferenz: ${d.invoice.buyerReference}`,metaX,my,205,8,false,'#555555');my+=14;}
+      drawOfficeFooter();
+      return 395;
+    }
 
-    // Titel / Metadaten
-    const titleY=305;
-    leftText(d.invoice.type||'Rechnung',L,titleY,250,23,true); 
-    if(d.invoice.project) leftText(d.invoice.project,L,titleY+34,260,10,false,'#6b7280');
-    const metaX=R-195;
-    let my=titleY+2;
-    leftText(`Rechnungsnr.: ${d.invoice.number}`,metaX,my,195,9,true); my+=16;
-    leftText(`Datum: ${deDate(d.invoice.issueDate)}`,metaX,my,195,9); my+=16;
-    leftText(`Fällig: ${deDate(d.invoice.dueDate)}`,metaX,my,195,9); my+=16;
-    if(d.invoice.deliveryDate){leftText(`Leistungsdatum: ${deDate(d.invoice.deliveryDate)}`,metaX,my,195,9);my+=16}
-    else if(d.invoice.periodStart&&d.invoice.periodEnd){leftText(`Leistungszeitraum: ${deDate(d.invoice.periodStart)} – ${deDate(d.invoice.periodEnd)}`,metaX,my,195,9);my+=16}
-    if(d.invoice.buyerReference){leftText(`Käuferreferenz: ${d.invoice.buyerReference}`,metaX,my,195,8,false,'#555555');my+=14}
+    function drawContinuationHeader(pageNo){
+      setBold(12,dark);doc.text(`Rechnung ${d.invoice.number} – Fortsetzung`,L,48,{width:contentW-70});
+      setRegular(7.5,muted);doc.text(`${d.buyer.name}${d.invoice.project?' · '+d.invoice.project:''}`,L,66,{width:contentW-70});
+      rightText(`Seite ${pageNo}`,R-60,50,60,8,false,muted);
+      doc.moveTo(L,84).lineTo(R,84).lineWidth(0.6).strokeColor(light).stroke();
+      return 102;
+    }
 
-    // Einleitungstext oberhalb der Leistungen (0.7.0).
-    // Dieser Text betrifft nur die sichtbare Rechnung; die maschinenlesbaren Positionen bleiben unverändert.
-    y=395;
+    // Breitere Zahlen-Spalten: Überschriften und Beträge bleiben sauber in einer Zeile.
+    const cols=[L,L+245,L+292,L+344,L+420,R];
+    function drawTableHeader(y){
+      const heads=['BESCHREIBUNG','MENGE','EINHEIT','EINZELPREIS','GESAMT'];
+      setBold(6.9,'#6b7280');
+      doc.text(heads[0],cols[0]+3,y,{width:cols[1]-cols[0]-6,lineBreak:false});
+      doc.text(heads[1],cols[1],y,{width:cols[2]-cols[1]-4,align:'right',lineBreak:false});
+      doc.text(heads[2],cols[2]+4,y,{width:cols[3]-cols[2]-8,lineBreak:false});
+      doc.text(heads[3],cols[3],y,{width:cols[4]-cols[3]-4,align:'right',lineBreak:false});
+      doc.text(heads[4],cols[4],y,{width:cols[5]-cols[4]-4,align:'right',lineBreak:false});
+      doc.moveTo(L,y+14).lineTo(R,y+14).lineWidth(0.6).strokeColor(light).stroke();
+      return y+25;
+    }
+
+    let pageNo=1;
+    let y=drawFirstPageHeader();
     if(d.invoice.introText){
       const introH=doc.heightOfString(text(d.invoice.introText),{width:contentW});
-      leftText(d.invoice.introText,L,y,contentW,8.8,false,muted);
-      y+=introH+18;
+      leftText(d.invoice.introText,L,y,contentW,8.8,false,muted);y+=introH+18;
     }
-
-    // Positionstabelle
-    const cols=[L,L+275,L+335,L+390,L+465,R];
-    const heads=['BESCHREIBUNG','MENGE','EINHEIT','EINZELPREIS','GESAMT'];
-    setBold(7.5,'#6b7280');
-    doc.text(heads[0],cols[0]+4,y,{width:cols[1]-cols[0]-8});
-    doc.text(heads[1],cols[1],y,{width:cols[2]-cols[1]-4,align:'right'});
-    doc.text(heads[2],cols[2]+4,y,{width:cols[3]-cols[2]-8});
-    doc.text(heads[3],cols[3],y,{width:cols[4]-cols[3]-4,align:'right'});
-    doc.text(heads[4],cols[4],y,{width:cols[5]-cols[4]-4,align:'right'});
-    doc.moveTo(L,y+15).lineTo(R,y+15).lineWidth(0.6).strokeColor(light).stroke();
-    y+=26;
+    y=drawTableHeader(y);
 
     for(const item of d.items){
-      const rowH=Math.max(30,doc.heightOfString(fit(item.description,140),{width:cols[1]-cols[0]-10})+12);
-      if(y+rowH>590){
-        doc.addPage(); y=65;
+      const desc=text(item.description);
+      setRegular(9,dark);
+      const rowH=Math.max(31,doc.heightOfString(desc,{width:cols[1]-cols[0]-10})+12);
+      const bottom=pageNo===1?firstPageContentBottom:otherPageContentBottom;
+      if(y+rowH>bottom){
+        doc.addPage();pageNo+=1;y=drawContinuationHeader(pageNo);y=drawTableHeader(y);
       }
-      leftText(item.description,cols[0]+4,y,cols[1]-cols[0]-10,9);
-      rightText(Number(item.quantity).toLocaleString('de-DE'),cols[1],y,cols[2]-cols[1]-4,9);
+      leftText(desc,cols[0]+4,y,cols[1]-cols[0]-10,9);
+      rightText(Number(item.quantity).toLocaleString('de-DE'),cols[1],y,cols[2]-cols[1]-5,9);
       leftText(item.unit||'',cols[2]+4,y,cols[3]-cols[2]-8,9);
-      rightText(money(item.unitPrice),cols[3],y,cols[4]-cols[3]-4,9);
-      rightText(money(item.lineTotal),cols[4],y,cols[5]-cols[4]-4,9,true);
+      rightText(money(item.unitPrice),cols[3],y,cols[4]-cols[3]-5,8.7);
+      rightText(money(item.lineTotal),cols[4],y,cols[5]-cols[4]-4,8.7,true);
       doc.moveTo(L,y+rowH-4).lineTo(R,y+rowH-4).lineWidth(0.45).strokeColor(lighter).stroke();
       y+=rowH;
     }
 
-    // Summen
+    // Summenblock wird nie über einen Seitenumbruch auseinandergerissen.
+    const prepaidRows=Array.isArray(d.invoice.prepaidInvoices)?d.invoice.prepaidInvoices:[];
+    const totalNeeded=92+(Number(d.invoice.prepaid||0)>0?(34+Math.max(1,prepaidRows.length)*14):0);
+    const bottom=pageNo===1?firstPageContentBottom:otherPageContentBottom;
+    if(y+20+totalNeeded>bottom){doc.addPage();pageNo+=1;y=drawContinuationHeader(pageNo)+12;}
     y+=18;
-    const sumX=R-235, labelW=123, amountW=112;
-    leftText('Netto',sumX,y,labelW,10); rightText(money(d.invoice.net),sumX+labelW,y,amountW,10,true); y+=21;
-    leftText('USt. 19 %',sumX,y,labelW,10); rightText(money(d.invoice.tax),sumX+labelW,y,amountW,10,true); y+=21;
-    leftText('Brutto',sumX,y,labelW,10); rightText(money(d.invoice.gross),sumX+labelW,y,amountW,10,true); y+=24;
-
-    // Schlussrechnung: bereits bezahlte Abschläge sichtbar und nachvollziehbar abziehen.
+    const sumX=R-250,labelW=128,amountW=122;
+    leftText('Netto',sumX,y,labelW,9.5);rightText(money(d.invoice.net),sumX+labelW,y,amountW,9.5,true);y+=20;
+    leftText('USt. 19 %',sumX,y,labelW,9.5);rightText(money(d.invoice.tax),sumX+labelW,y,amountW,9.5,true);y+=20;
+    leftText('Brutto',sumX,y,labelW,9.5);rightText(money(d.invoice.gross),sumX+labelW,y,amountW,9.5,true);y+=23;
     if(Number(d.invoice.prepaid||0)>0){
-      const rows=Array.isArray(d.invoice.prepaidInvoices)?d.invoice.prepaidInvoices:[];
-      setBold(8.2,muted); doc.text('Bereits gezahlte Abschläge',sumX,y,{width:235}); y+=15;
-      for(const r of rows){
-        leftText(`${r.number}${r.date?' · '+deDate(r.date):''}`,sumX,y,labelW+25,7.5,false,muted);
-        rightText('− '+money(r.amount),sumX+labelW,y,amountW,8,false,muted); y+=14;
-      }
-      if(!rows.length){leftText('Bereits gezahlt',sumX,y,labelW,8,false,muted);rightText('− '+money(d.invoice.prepaid),sumX+labelW,y,amountW,8,false,muted);y+=14}
-      doc.moveTo(sumX,y+2).lineTo(R,y+2).lineWidth(0.7).strokeColor(dark).stroke(); y+=10;
-      leftText('Noch zu zahlen',sumX,y,labelW,12,true); rightText(money(d.invoice.due),sumX+labelW,y,amountW,12,true); y+=32;
+      setBold(8.2,muted);doc.text('Bereits gezahlte Abschläge',sumX,y,{width:250});y+=15;
+      for(const r of prepaidRows){leftText(`${r.number}${r.date?' · '+deDate(r.date):''}`,sumX,y,labelW+20,7.4,false,muted);rightText('− '+money(r.amount),sumX+labelW,y,amountW,7.8,false,muted);y+=14;}
+      if(!prepaidRows.length){leftText('Bereits gezahlt',sumX,y,labelW,8,false,muted);rightText('− '+money(d.invoice.prepaid),sumX+labelW,y,amountW,8,false,muted);y+=14;}
+      doc.moveTo(sumX,y+2).lineTo(R,y+2).lineWidth(0.7).strokeColor(dark).stroke();y+=10;
+      leftText('Noch zu zahlen',sumX,y,labelW,11.5,true);rightText(money(d.invoice.due),sumX+labelW,y,amountW,11.5,true);y+=30;
     }else{
       doc.moveTo(sumX,y-6).lineTo(R,y-6).lineWidth(0.7).strokeColor(dark).stroke();
-      leftText('Gesamtbetrag',sumX,y,labelW,12,true); rightText(money(d.invoice.gross),sumX+labelW,y,amountW,12,true); y+=32;
+      leftText('Gesamtbetrag',sumX,y,labelW,11.5,true);rightText(money(d.invoice.gross),sumX+labelW,y,amountW,11.5,true);y+=30;
     }
 
-    // Hinweis + vollständiger dreispaltiger Kanzlei-Fußbereich.
-    // Der Fußbereich bleibt als geschlossener Block auf genau einer Seite und darf
-    // nicht durch automatischen Textumbruch auf Folgeseiten springen.
-    if(y>605){doc.addPage(); y=65}
     const noteText=d.invoice.notes||'Vielen Dank für Ihren Auftrag. Bitte überweisen Sie den Rechnungsbetrag innerhalb des angegebenen Zahlungsziels.';
-    const noteY=Math.max(y+24,620);
-    leftText(noteText,L,noteY,contentW,8.1,false,muted);
+    setRegular(8.1,muted);const noteH=doc.heightOfString(noteText,{width:contentW});
+    const noteBottom=pageNo===1?firstPageContentBottom:otherPageContentBottom;
+    if(y+20+noteH>noteBottom){doc.addPage();pageNo+=1;y=drawContinuationHeader(pageNo)+18;}
+    leftText(noteText,L,y+18,contentW,8.1,false,muted);
 
-    const footerY=690;
-    const gap=18;
-    const colW=(contentW-gap*2)/3;
-    const c1=L, c2=L+colW+gap, c3=L+(colW+gap)*2;
-    const footerColor='#777b82';
-    const footerSize=5.9;
-    const lineH=9.4;
-    const f=(value,x,yy,w=colW)=>{setRegular(footerSize,footerColor);doc.text(text(value),x,yy,{width:w,lineBreak:false});};
-
-    let fy=footerY;
-    f('dahler straße 15',c1,fy); fy+=lineH;
-    f('58809 neuenrade',c1,fy); fy+=lineH;
-    f('fon 02392 96387-0',c1,fy); fy+=lineH;
-    f('fax 02392 64686',c1,fy); fy+=lineH*1.7;
-    f('info@schnabel-architekten.de',c1,fy); fy+=lineH;
-    f('www.schnabel-architekten.de',c1,fy);
-
-    fy=footerY;
-    f('tom schnabel',c2,fy); fy+=lineH;
-    f('dipl.-ing. architekt',c2,fy); fy+=lineH;
-    f('staatlich anerkannter sachverständiger',c2,fy); fy+=lineH;
-    f('für schall- und wärmeschutz',c2,fy); fy+=lineH*1.7;
-    f('frank schnabel',c2,fy); fy+=lineH;
-    f('dr.-ing. beratender ingenieur',c2,fy); fy+=lineH;
-    f('statik und tragwerksplanung',c2,fy);
-
-    fy=footerY;
-    f('Schnabel Architekt und Beratender Ingenieur',c3,fy); fy+=lineH;
-    f('PartG mbB',c3,fy); fy+=lineH;
-    f('Amtsgericht Essen: PR 4177',c3,fy); fy+=lineH;
-    f('St.Nr. 302/5743/1079',c3,fy); fy+=lineH*1.7;
-    f('Vereinigte Sparkasse im Märkischen Kreis',c3,fy); fy+=lineH;
-    f('IBAN DE19 4585 1020 0093 0123 00',c3,fy); fy+=lineH;
-    f('BIC WELADED1PLB',c3,fy);
-
+    // Seitenzahlen auf Folgeseiten; die Kanzlei-Fußzeile bleibt ausschließlich auf Seite 1.
+    const range=doc.bufferedPageRange();
+    for(let i=1;i<range.count;i++){
+      doc.switchToPage(range.start+i);
+      rightText(`Seite ${i+1} von ${range.count}`,R-90,H-38,90,7,false,muted);
+    }
+    doc.switchToPage(range.start+range.count-1);
     doc.end();
   });
 }

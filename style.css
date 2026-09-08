@@ -105,3 +105,19 @@ body{background:var(--proto-bg);color:#171717}
 #invoiceModal .export-message{margin-top:12px}
 @media(max-width:900px){#invoiceModal .form-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}#invoiceModal .invoice-bottom{grid-template-columns:1fr}#invoiceModal .item-row{grid-template-columns:1.7fr .55fr .65fr .8fr .8fr 36px}}
 
+
+
+/* 0.7.6 – Vorschau strikt nur per Button. Verhindert jede Überdeckung des Rechnungseditors. */
+#previewModal{display:none!important}
+#previewModal.preview-active{display:flex!important}
+#previewModal.open{display:none!important}
+#previewModal.open.preview-active{display:flex!important}
+
+/* 0.7.7: saubere Rechnungs-Spalten in Vorschau/Druck */
+.paper table{table-layout:fixed}
+.paper table th:nth-child(1),.paper table td:nth-child(1){width:47%}
+.paper table th:nth-child(2),.paper table td:nth-child(2){width:9%;white-space:nowrap}
+.paper table th:nth-child(3),.paper table td:nth-child(3){width:10%;white-space:nowrap}
+.paper table th:nth-child(4),.paper table td:nth-child(4){width:17%;white-space:nowrap}
+.paper table th:nth-child(5),.paper table td:nth-child(5){width:17%;white-space:nowrap}
+.paper table th{overflow-wrap:normal;word-break:normal}
