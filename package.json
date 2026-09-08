@@ -1,1 +1,44 @@
-{"name":"invoiceassist-desktop","version":"0.7.1","description":"Lokale Rechnungs-Desktop-App mit Kundenbearbeitung, historischen Kundensnapshots, Abschlags-/Schlussrechnungen, HOAI-/Stundenbausteinen sowie ZUGFeRD/XRechnung Export","main":"main.js","author":"InvoiceAssist","license":"UNLICENSED","scripts":{"start":"electron .","dist:win":"electron-builder --win portable"},"dependencies":{"@stackforge-eu/factur-x":"1.4.0","pdfkit":"0.17.2"},"devDependencies":{"electron":"44.2.0","electron-builder":"^26.0.12"},"build":{"appId":"de.invoiceassist.desktop","productName":"InvoiceAssist","asar":false,"files":["main.js","preload.js","renderer/**/*","assets/**/*","package.json","node_modules/**/*"],"win":{"target":[{"target":"portable","arch":["x64"]}],"artifactName":"InvoiceAssist-${version}-Windows-x64.${ext}"}}}
+{
+  "name": "invoiceassist-desktop",
+  "version": "0.7.3",
+  "description": "Lokale Rechnungs-Desktop-App mit Kundenbearbeitung, historischen Kundensnapshots, Abschlags-/Schlussrechnungen, HOAI-/Stundenbausteinen sowie ZUGFeRD/XRechnung Export",
+  "main": "main.js",
+  "author": "InvoiceAssist",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "@stackforge-eu/factur-x": "1.4.0",
+    "pdfkit": "0.17.2"
+  },
+  "devDependencies": {
+    "electron": "44.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "de.invoiceassist.desktop",
+    "productName": "InvoiceAssist",
+    "asar": false,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "InvoiceAssist-${version}-Windows-x64.${ext}"
+    }
+  }
+}

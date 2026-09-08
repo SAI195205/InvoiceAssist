@@ -94,7 +94,7 @@ body{background:var(--proto-bg);color:#171717}
 #invoiceModal .modal-head h2{font-size:19px;margin:0}#invoiceModal .modal-head p{font-size:11px;margin-top:3px}
 #invoiceModal #invoiceForm{height:calc(100% - 72px);overflow:auto;display:grid;grid-template-columns:minmax(590px,1fr) minmax(470px,560px);column-gap:18px;align-content:start;padding:16px 18px 20px}
 #invoiceModal #invoiceForm>*{grid-column:1;min-width:0}
-#invoiceModal .live-preview-pane{grid-column:2;grid-row:1 / span 30;position:sticky;top:0;align-self:start;min-width:0}
+#invoiceModal #invoiceForm > .live-preview-pane{grid-column:2;grid-row:1 / span 30;position:sticky;top:0;align-self:start;min-width:0}
 .live-preview-head{height:30px;display:flex;justify-content:space-between;align-items:center;font-size:13px}.live-preview-head span{font-size:10px;color:#777;font-weight:400}
 .live-preview-scroll{height:calc(100vh - 145px);overflow:auto;padding:0 8px 18px 0}
 #invoiceModal .live-paper{width:100%;min-height:0;aspect-ratio:210/297;padding:8.5% 8% 17%;box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:8px;transform-origin:top center}
