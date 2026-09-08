@@ -77,7 +77,7 @@ async function createInvoicePdf(d){
 
     function drawFirstPageHeader(){
       let y=51;
-      leftText(d.seller.name,L,y,250,11,true);y+=17;
+      leftText(d.seller.name,L,y,250,11,true);y+=30;
       leftText(d.seller.street,L,y,250,8,false,muted);y+=12;
       leftText(`${d.seller.zip} ${d.seller.city}`.trim(),L,y,250,8,false,muted);y+=12;
       if(d.seller.email){leftText(d.seller.email,L,y,250,8,false,muted);y+=12;}
