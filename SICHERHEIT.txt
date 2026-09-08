@@ -1,0 +1,6 @@
+InvoiceAssist 0.5
+- Keine BAT-Datei beim Endnutzer.
+- Kein Node/npm-Download beim Start.
+- Kein externer E-Rechnungsdienst.
+- Rechnungsdaten werden lokal verarbeitet.
+- Build-Abhängigkeiten werden nur von GitHub Actions beim Erstellen der EXE geladen.
