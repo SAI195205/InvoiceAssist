@@ -1,0 +1,33 @@
+name: Build Windows App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Abhängigkeiten installieren
+        run: npm install
+
+      - name: Windows-App bauen
+        run: npm run dist:win
+
+      - name: EXE als Artifact bereitstellen
+        uses: actions/upload-artifact@v4
+        with:
+          name: InvoiceAssist-Windows
+          path: dist/**
+          if-no-files-found: error
