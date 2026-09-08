@@ -92,9 +92,10 @@ body{background:var(--proto-bg);color:#171717}
 #invoiceModal .invoice-editor{width:min(1580px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);max-height:none;border-radius:12px;padding:0;overflow:hidden;background:var(--proto-bg)}
 #invoiceModal .modal-head{padding:16px 18px;background:#fff;border-bottom:1px solid var(--proto-line);margin:0}
 #invoiceModal .modal-head h2{font-size:19px;margin:0}#invoiceModal .modal-head p{font-size:11px;margin-top:3px}
-#invoiceModal #invoiceForm{height:calc(100% - 72px);overflow:auto;display:grid;grid-template-columns:minmax(590px,1fr) minmax(470px,560px);column-gap:18px;align-content:start;padding:16px 18px 20px}
-#invoiceModal #invoiceForm>*{grid-column:1;min-width:0}
-#invoiceModal #invoiceForm > .live-preview-pane{grid-column:2;grid-row:1 / span 30;position:sticky;top:0;align-self:start;min-width:0}
+#invoiceModal .invoice-editor{position:relative}
+#invoiceModal #invoiceForm{height:calc(100% - 72px);overflow:auto;display:block;padding:16px 596px 20px 18px}
+#invoiceModal #invoiceForm>*{min-width:0}
+#invoiceModal #invoiceForm > .live-preview-pane{position:absolute;top:82px;right:18px;bottom:16px;width:560px;min-width:0;overflow:hidden}
 .live-preview-head{height:30px;display:flex;justify-content:space-between;align-items:center;font-size:13px}.live-preview-head span{font-size:10px;color:#777;font-weight:400}
 .live-preview-scroll{height:calc(100vh - 145px);overflow:auto;padding:0 8px 18px 0}
 #invoiceModal .live-paper{width:100%;min-height:0;aspect-ratio:210/297;padding:8.5% 8% 17%;box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:8px;transform-origin:top center}
@@ -115,5 +116,5 @@ body{background:var(--proto-bg);color:#171717}
 #invoiceModal .invoice-bottom{gap:16px;margin-top:16px;grid-template-columns:1fr 300px}#invoiceModal .modal-actions{margin-top:14px;padding-bottom:2px}
 #invoiceModal .export-message{margin-top:10px}
 
-@media(max-width:1150px){#invoiceModal #invoiceForm{grid-template-columns:1fr}.live-preview-pane{display:none!important}}
+@media(max-width:1250px){#invoiceModal #invoiceForm{padding-right:18px}#invoiceModal #invoiceForm > .live-preview-pane{display:none!important}}
 @media print{#invoiceModal .live-preview-pane{display:none!important}}
