@@ -170,7 +170,7 @@ async function createInvoicePdf(d){
     const f=(value,x,yy,w=colW)=>{setRegular(footerSize,footerColor);doc.text(text(value),x,yy,{width:w,lineBreak:false});};
 
     let fy=footerY;
-    f('am zollhaus 4',c1,fy); fy+=lineH;
+    f('dahler straße 15',c1,fy); fy+=lineH;
     f('58809 neuenrade',c1,fy); fy+=lineH;
     f('fon 02392 96387-0',c1,fy); fy+=lineH;
     f('fax 02392 64686',c1,fy); fy+=lineH*1.7;
