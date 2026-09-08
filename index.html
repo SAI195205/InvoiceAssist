@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>InvoiceAssist</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">IA</div><div><div class="brand-name">InvoiceAssist</div><div class="brand-sub">Rechnungen einfach erstellen</div></div></div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-view="invoices">▤ <span>Rechnungen</span></button>
+        <button class="nav-item" data-view="customers">◎ <span>Kunden & Projekte</span></button>
+        <button class="nav-item" data-view="settings">⚙ <span>Einstellungen</span></button>
+      </nav>
+      <div class="sidebar-foot"><span class="status-dot"></span>Lokal gespeichert</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Überblick über deine Rechnungen</p></div><button class="primary" id="newInvoiceBtn">+ Neue Rechnung</button></header>
+
+      <section id="dashboard" class="view active">
+        <div class="cards">
+          <article class="metric-card"><div class="metric-label">Offene Rechnungen</div><div class="metric-value" id="metricOpen">0,00 €</div><div class="metric-meta" id="metricOpenCount">0 Rechnungen</div></article>
+          <article class="metric-card"><div class="metric-label">Bezahlt</div><div class="metric-value" id="metricPaid">0,00 €</div><div class="metric-meta">Gesamtsumme</div></article>
+          <article class="metric-card"><div class="metric-label">Kunden / Projekte</div><div class="metric-value"><span id="metricCustomers">0</span> / <span id="metricProjects">0</span></div><div class="metric-meta">lokal gespeichert</div></article>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h2>Letzte Rechnungen</h2><p>Deine zuletzt angelegten Vorgänge</p></div><button class="ghost" data-view-target="invoices">Alle anzeigen</button></div><div id="recentInvoices"></div></div>
+      </section>
+
+      <section id="invoices" class="view"><div class="panel"><div class="panel-head"><div><h2>Rechnungen</h2><p>Erstellen, öffnen und verwalten</p></div><button class="primary small" id="newInvoiceBtn2">+ Rechnung</button></div><div id="invoiceList"></div></div></section>
+
+      <section id="customers" class="view">
+        <div class="split">
+          <div class="panel"><div class="panel-head"><div><h2>Kunden</h2><p>Kunden öffnen, Projekte und Rechnungen verwalten</p></div></div><div id="customerList"></div></div>
+          <div class="panel compact"><h2>Kunde anlegen</h2><form id="customerForm" class="form-grid one">
+            <label>Name / Firma<input id="customerName" required placeholder="z. B. Bauherr Mustermann" /></label>
+            <label>Straße<input id="customerStreet" placeholder="Musterstraße 1" /></label>
+            <div class="form-grid two"><label>PLZ<input id="customerZip" placeholder="58809" /></label><label>Ort<input id="customerCity" placeholder="Neuenrade" /></label></div>
+            <label>E-Mail / elektronische Rechnungsadresse<input id="customerEmail" type="email" placeholder="mail@beispiel.de" /></label>
+            <label>USt-IdNr. (optional)<input id="customerVat" placeholder="DE123456789" /></label>
+            <label>Käuferreferenz / Leitweg-ID (optional)<input id="customerBuyerReference" placeholder="z. B. Leitweg-ID oder Bestellreferenz" /></label>
+            <button class="primary" type="submit">Kunde speichern</button>
+          </form></div>
+        </div>
+      </section>
+
+      <section id="customerDetail" class="view">
+        <div class="customer-detail-head"><button class="ghost" id="backToCustomers">← Zurück zu Kunden</button><div class="customer-head-actions"><button class="ghost small" id="editCustomerBtn">Kunde bearbeiten</button><button class="primary small" id="newInvoiceForCustomer">+ Rechnung für diesen Kunden</button></div></div>
+        <div class="panel customer-profile"><div><div class="eyebrow">Kunde</div><h2 id="detailCustomerName">—</h2><div class="customer-meta" id="detailCustomerAddress"></div></div><div class="customer-detail-metrics"><div><span>Projekte</span><strong id="detailProjectCount">0</strong></div><div><span>Offen</span><strong id="detailOpenAmount">0,00 €</strong></div><div><span>Bezahlt</span><strong id="detailPaidAmount">0,00 €</strong></div></div></div>
+        <div class="customer-project-grid">
+          <div class="panel"><div class="panel-head"><div><h2>Projekte</h2><p>Rechnungen werden einem Projekt zugeordnet</p></div></div><div id="projectList"></div></div>
+          <div class="panel compact"><h2>Projekt anlegen</h2><form id="projectForm" class="form-grid one"><label>Projekt / Bauvorhaben<input id="projectName" required placeholder="z. B. Neubau EFH Musterstraße" /></label><label>Interne Notiz<textarea id="projectNote" rows="3" placeholder="optional"></textarea></label><button class="primary" type="submit">Projekt speichern</button></form></div>
+        </div>
+        <div class="panel space-top"><div class="panel-head"><div><h2>Rechnungen dieses Kunden</h2><p>Abschläge und Schlussrechnungen sind projektbezogen</p></div></div><div id="customerInvoiceList"></div></div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="panel compact wide"><div class="panel-head"><div><h2>Unternehmensdaten</h2><p>Diese Daten erscheinen auf der Rechnung</p></div></div><form id="settingsForm" class="form-grid two">
+          <label>Firmenname<input id="companyName" /></label><label>E-Mail / elektronische Rechnungsadresse<input id="companyEmail" type="email" /></label><label>Straße<input id="companyStreet" /></label><label>PLZ<input id="companyZip" /></label><label>Ort<input id="companyCity" /></label><label>Telefon<input id="companyPhone" /></label><label>IBAN<input id="companyIban" /></label><label>Steuernummer<input id="companyTax" /></label><label>USt-IdNr.<input id="companyVat" /></label><label>Ansprechpartner E-Rechnung<input id="companyContact" placeholder="z. B. Buchhaltung" /></label><div class="full"><button class="primary" type="submit">Einstellungen speichern</button></div>
+        </form></div>
+        <div class="panel compact wide space-top"><div class="panel-head"><div><h2>E-Rechnung</h2><p>ZUGFeRD und XRechnung werden vollständig lokal erzeugt.</p></div><span class="badge paid">Lokal integriert</span></div><div class="subtle-box"><strong>Keine externe Übertragung:</strong> Rechnungsdaten werden nur innerhalb der Desktop-App verarbeitet.</div></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="invoiceModal" aria-hidden="true"><div class="modal-card invoice-editor">
+    <div class="modal-head"><div><h2 id="editorTitle">Neue Rechnung</h2><p>Kunde, Projekt, Rechnungsart und Leistungstyp auswählen</p></div><button class="icon-btn" id="closeModal">×</button></div>
+    <form id="invoiceForm">
+      <div class="form-grid four"><label>Rechnungsnummer<input id="invoiceNumber" required /></label><label>Datum<input id="invoiceDate" type="date" required /></label><label>Fällig am<input id="invoiceDue" type="date" required /></label><label>Art<select id="invoiceType"><option>Rechnung</option><option>Abschlagsrechnung</option><option>Teilrechnung</option><option>Schlussrechnung</option></select></label></div>
+      <div class="form-grid two space-top"><label>Kunde<select id="invoiceCustomer" required></select></label><label>Projekt<select id="invoiceProject" required></select></label></div>
+      <div class="form-grid four space-top einvoice-fields"><label>Leistungsdatum<input id="invoiceDeliveryDate" type="date" /></label><label>Leistungszeitraum von<input id="invoicePeriodStart" type="date" /></label><label>Leistungszeitraum bis<input id="invoicePeriodEnd" type="date" /></label><label>Käuferreferenz / Leitweg-ID<input id="invoiceBuyerReference" placeholder="optional bei ZUGFeRD" /></label></div>
+      <div class="field-help">Für eine E-Rechnung wird entweder ein Leistungsdatum oder ein vollständiger Leistungszeitraum benötigt. Für XRechnung ist zusätzlich eine Käuferreferenz erforderlich.</div>
+
+      <div class="intro-builder space-top"><div class="intro-builder-head"><div><h3>Einleitungstext</h3><p>Text vor den Leistungspositionen</p></div><label class="compact-label">Leistungsbereich<select id="serviceArea"><option value="architecture">Architekturleistungen</option><option value="engineering">Ingenieurleistungen</option><option value="both" selected>Architektur- und Ingenieurleistungen</option><option value="custom">Eigener Text</option></select></label></div><textarea id="invoiceIntro" rows="3"></textarea></div>
+
+      <div id="prepaidSection" class="prepaid-section" hidden><div class="items-head"><div><h3>Bereits gezahlte Abschlagsrechnungen</h3><p>Passende bezahlte Abschläge dieses Kunden und Projekts</p></div></div><div id="prepaidList"></div><div class="prepaid-total"><span>Summe bereits gezahlt</span><strong id="prepaidTotal">0,00 €</strong></div></div>
+
+      <div class="items-wrap"><div class="items-head"><div><h3>Positionen</h3><p>Freie Positionen, Stunden- oder HOAI-Abrechnung</p></div><div class="item-buttons"><button type="button" class="ghost" id="addItem">+ Freie Position</button><button type="button" class="ghost" id="addHours">+ Stunden</button><button type="button" class="ghost" id="addHoai">+ HOAI</button></div></div><div class="item-row item-labels"><span>Beschreibung</span><span>Menge</span><span>Einheit</span><span>Einzelpreis</span><span>Gesamt</span><span></span></div><div id="items"></div></div>
+
+      <div class="invoice-bottom"><div class="notes"><label>Hinweis / Zahlungsziel<textarea id="invoiceNotes" rows="5" placeholder="Vielen Dank für Ihren Auftrag."></textarea></label></div><div class="totals"><div><span>Netto</span><strong id="sumNet">0,00 €</strong></div><div><span>USt. 19 %</span><strong id="sumVat">0,00 €</strong></div><div><span>Brutto</span><strong id="sumGross">0,00 €</strong></div><div id="sumPrepaidRow" hidden><span>abzgl. bezahlt</span><strong id="sumPrepaid">0,00 €</strong></div><div class="grand"><span id="sumGrandLabel">Gesamt</span><strong id="sumDue">0,00 €</strong></div></div></div>
+
+      <aside class="live-preview-pane">
+        <div class="live-preview-head"><strong>Rechnungsvorschau</strong><span>ändert sich live</span></div>
+        <div class="live-preview-scroll"><div class="paper live-paper" id="liveInvoicePreview"></div></div>
+      </aside>
+
+      <div id="exportMessage" class="export-message" hidden></div>
+      <div class="modal-actions export-actions"><div class="export-group"><button type="button" class="ghost ebtn" id="previewBtn">Vorschau / Drucken</button><button type="button" class="ghost ebtn" id="zugferdBtn">ZUGFeRD-PDF</button><button type="button" class="ghost ebtn" id="xrechnungBtn">XRechnung-XML</button></div><div class="export-group"><button type="button" class="ghost" id="closeModal2">Abbrechen</button><button class="primary" type="submit">Rechnung speichern</button></div></div>
+    </form>
+  </div></div>
+
+
+  <div class="modal" id="customerEditModal" aria-hidden="true"><div class="modal-card narrow-card">
+    <div class="modal-head"><div><h2>Kunde bearbeiten</h2><p>Änderungen gelten nur für neue Rechnungen. Bereits gespeicherte Rechnungen behalten die damaligen Kundendaten.</p></div><button class="icon-btn" id="closeCustomerEdit">×</button></div>
+    <form id="customerEditForm" class="form-grid one">
+      <label>Name / Firma<input id="editCustomerName" required /></label>
+      <label>Straße<input id="editCustomerStreet" /></label>
+      <div class="form-grid two"><label>PLZ<input id="editCustomerZip" /></label><label>Ort<input id="editCustomerCity" /></label></div>
+      <label>E-Mail / elektronische Rechnungsadresse<input id="editCustomerEmail" type="email" /></label>
+      <label>USt-IdNr. (optional)<input id="editCustomerVat" /></label>
+      <label>Käuferreferenz / Leitweg-ID (optional)<input id="editCustomerBuyerReference" /></label>
+      <div class="modal-actions"><button type="button" class="ghost" id="cancelCustomerEdit">Abbrechen</button><button class="primary" type="submit">Änderungen speichern</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal" id="hoaiModal" aria-hidden="true"><div class="modal-card hoai-card">
+    <div class="modal-head"><div><h2>HOAI-Position</h2><p>Erster Abrechnungsbaustein. Prozentwerte und Honoraransatz bitte fachlich prüfen.</p></div><button class="icon-btn" id="closeHoai">×</button></div>
+    <div class="hoai-warning">Die HOAI-Maske ist ein Rechen- und Darstellungsbaustein. Sie ersetzt keine Prüfung der Honorarvereinbarung oder der anwendbaren HOAI-Fassung.</div>
+    <div class="form-grid four space-top">
+      <label>Leistungsbild<select id="hoaiService"><option>Objektplanung Gebäude</option><option>Tragwerksplanung</option><option>Freianlagen</option><option>Technische Ausrüstung</option><option value="custom">Sonstiges / frei</option></select></label>
+      <label>Honorarzone<select id="hoaiZone"><option>I</option><option>II</option><option selected>III</option><option>IV</option><option>V</option></select></label>
+      <label>Honorarsatz<select id="hoaiRate"><option>Basissatz</option><option selected>Mittelsatz</option><option>Höchstsatz</option><option>frei vereinbart</option></select></label>
+      <label>Anrechenbare Kosten (€)<input id="hoaiCosts" type="number" min="0" step="0.01" value="0" /></label>
+    </div>
+    <div class="form-grid four space-top">
+      <label>Honorar 100 % netto (€)<input id="hoaiBaseFee" type="number" min="0" step="0.01" value="0" /></label>
+      <label>Zuschlag (%)<input id="hoaiSurcharge" type="number" min="0" step="0.01" value="0" /></label>
+      <label>Abschlag (%)<input id="hoaiDiscount" type="number" min="0" step="0.01" value="0" /></label>
+      <label>Nebenkosten netto (€)<input id="hoaiAncillary" type="number" min="0" step="0.01" value="0" /></label>
+    </div>
+    <div class="form-grid two space-top"><label>Besondere Leistung / Zusatztext<input id="hoaiSpecialText" placeholder="optional" /></label><label>Betrag besondere Leistung netto (€)<input id="hoaiSpecialAmount" type="number" min="0" step="0.01" value="0" /></label></div>
+    <div class="hoai-phases space-top"><div class="items-head"><div><h3>Leistungsphasen</h3><p>Auswählen und Prozentsätze bei Bedarf anpassen</p></div><strong id="hoaiPercentTotal">0,00 %</strong></div><div id="hoaiPhaseList"></div></div>
+    <div class="hoai-result"><div><span>Honorar aus LPH</span><strong id="hoaiPerformanceFee">0,00 €</strong></div><div><span>Gesamt netto</span><strong id="hoaiTotal">0,00 €</strong></div></div>
+    <div class="modal-actions"><button class="ghost" type="button" id="cancelHoai">Abbrechen</button><button class="primary" type="button" id="saveHoai">HOAI-Position übernehmen</button></div>
+  </div></div>
+
+  <div class="modal" id="previewModal" aria-hidden="true"><div class="modal-card preview-card"><div class="modal-head"><div><h2>Rechnungsvorschau</h2><p>Diese Darstellung wird beim Drucken verwendet</p></div><button class="icon-btn" id="closePreview">×</button></div><div class="paper" id="invoicePreview"></div><div class="modal-actions"><button class="ghost" id="closePreview2">Schließen</button><button class="primary" id="printInvoice">Drucken / als PDF speichern</button></div></div></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

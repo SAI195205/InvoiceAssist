@@ -1,0 +1,119 @@
+:root{--bg:#f4f6f8;--panel:#fff;--text:#17202a;--muted:#748094;--line:#e5e9ef;--accent:#1f6feb;--accent-dark:#1859bf;--soft:#eef4ff;--success:#1f9d68;--shadow:0 18px 50px rgba(19,32,56,.08);--radius:18px}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}.app-shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.sidebar{background:#111827;color:#fff;padding:24px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}.brand{display:flex;gap:12px;align-items:center;padding:2px 8px 26px}.brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#fff;color:#111827;font-weight:800}.brand-name{font-weight:750;font-size:18px}.brand-sub{font-size:12px;color:#9ba7b9;margin-top:2px}.nav{display:grid;gap:8px}.nav-item{border:0;background:transparent;color:#aab4c5;text-align:left;padding:12px 13px;border-radius:11px;cursor:pointer;display:flex;gap:12px;align-items:center}.nav-item:hover,.nav-item.active{background:#1f2937;color:#fff}.sidebar-foot{margin-top:auto;color:#9ba7b9;font-size:13px;padding:10px;display:flex;align-items:center;gap:8px}.status-dot{width:8px;height:8px;border-radius:50%;background:#38c784}.main{padding:34px 42px 60px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.topbar h1{margin:0;font-size:29px;letter-spacing:-.5px}.topbar p,.panel-head p{margin:5px 0 0;color:var(--muted)}.primary,.ghost{border-radius:11px;padding:11px 16px;border:1px solid transparent;cursor:pointer;font-weight:650}.primary{background:var(--accent);color:white}.primary:hover{background:var(--accent-dark)}.primary.small{padding:9px 13px}.ghost{background:#fff;border-color:var(--line);color:var(--text)}.ghost:hover{background:#f8fafc}.view{display:none}.view.active{display:block}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}.metric-card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.metric-card{padding:22px}.metric-label{font-size:13px;color:var(--muted);font-weight:650}.metric-value{font-size:28px;font-weight:800;margin:8px 0 4px}.metric-meta{color:var(--muted);font-size:13px}.panel{padding:22px}.panel.compact{padding:24px}.panel.wide{max-width:980px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.panel h2{margin:0;font-size:19px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:13px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}.table th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}.table tr:last-child td{border-bottom:0}.badge{display:inline-flex;padding:6px 9px;border-radius:999px;background:#fff5dc;color:#8f6410;font-size:12px;font-weight:700}.badge.paid{background:#e9f8f1;color:#187552}.empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.split{display:grid;grid-template-columns:1.35fr .65fr;gap:20px}.form-grid{display:grid;gap:16px}.form-grid.one{grid-template-columns:1fr}.form-grid.two{grid-template-columns:repeat(2,1fr)}.form-grid.four{grid-template-columns:repeat(4,1fr)}.form-grid .full{grid-column:1/-1}label{display:grid;gap:7px;font-size:13px;font-weight:650;color:#4b5563}input,select,textarea{width:100%;border:1px solid #d9dee7;background:#fff;border-radius:10px;padding:11px 12px;outline:none;color:var(--text)}input:focus,select:focus,textarea:focus{border-color:#8eb9ff;box-shadow:0 0 0 3px #eaf2ff}.space-top{margin-top:16px}.customer-card{display:flex;justify-content:space-between;gap:20px;padding:15px 4px;border-bottom:1px solid var(--line)}.customer-card:last-child{border-bottom:0}.customer-name{font-weight:750}.customer-meta{color:var(--muted);font-size:13px;margin-top:4px}.danger-link{border:0;background:transparent;color:#b42318;cursor:pointer}.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;padding:34px;overflow:auto;z-index:30}.modal.open{display:flex}.modal-card{background:#fff;width:min(1180px,100%);border-radius:20px;box-shadow:0 30px 90px rgba(0,0,0,.22);padding:26px}.invoice-editor{min-height:600px}.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}.modal-head h2{margin:0}.modal-head p{color:var(--muted);margin:5px 0 0}.icon-btn{border:0;background:#f2f4f7;width:38px;height:38px;border-radius:10px;font-size:24px;cursor:pointer}.items-wrap{margin-top:28px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.items-head{padding:15px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.items-head h3{margin:0;font-size:15px}.item-row{display:grid;grid-template-columns:minmax(260px,2.4fr) .55fr .65fr .8fr .8fr 42px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}.item-row:last-child{border-bottom:0}.item-labels{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:750;background:#f8fafc}.item-row input{padding:9px 10px}.item-total{text-align:right;font-weight:700}.remove-item{border:0;background:transparent;font-size:20px;color:#9aa4b2;cursor:pointer}.invoice-bottom{display:grid;grid-template-columns:1fr 360px;gap:30px;margin-top:24px}.totals{border:1px solid var(--line);border-radius:14px;padding:14px 18px}.totals>div{display:flex;justify-content:space-between;padding:9px 0}.totals .grand{border-top:1px solid var(--line);margin-top:5px;padding-top:14px;font-size:18px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}.preview-card{max-width:980px}.paper{width:210mm;min-height:297mm;max-width:100%;margin:0 auto;background:#fff;padding:24mm 20mm;box-shadow:0 4px 30px rgba(0,0,0,.08);border:1px solid #edf0f4}.paper .inv-top{display:flex;justify-content:space-between;gap:40px}.paper .company{font-size:13px;line-height:1.6}.paper .company strong{font-size:18px}.paper .recipient{margin-top:38px;line-height:1.55}.paper .inv-title{margin-top:42px;display:flex;justify-content:space-between;align-items:flex-end}.paper h1{font-size:28px;margin:0}.paper .meta{font-size:13px;line-height:1.7;text-align:right}.paper table{width:100%;border-collapse:collapse;margin-top:30px}.paper th,.paper td{padding:11px 8px;border-bottom:1px solid #e6e8eb;font-size:13px;text-align:left}.paper th{text-transform:uppercase;font-size:10px;letter-spacing:.04em}.paper td.num,.paper th.num{text-align:right}.paper .paper-total{margin-left:auto;margin-top:20px;width:310px}.paper .paper-total div{display:flex;justify-content:space-between;padding:6px 0}.paper .paper-total .grand{font-weight:800;font-size:17px;border-top:1px solid #cfd5dc;margin-top:5px;padding-top:10px}.paper .footer-note{margin-top:42px;font-size:13px;line-height:1.6;white-space:pre-wrap}.action-link{border:0;background:transparent;color:var(--accent);font-weight:700;cursor:pointer;padding:0}.row-actions{display:flex;gap:12px}.status-select{border:0;background:transparent;padding:0;color:inherit;font-weight:700;cursor:pointer}
+@media(max-width:980px){.app-shell{grid-template-columns:82px 1fr}.brand>div:last-child,.nav-item span,.sidebar-foot{display:none}.brand{justify-content:center}.nav-item{justify-content:center}.main{padding:28px 22px}.cards,.split{grid-template-columns:1fr}.form-grid.four{grid-template-columns:repeat(2,1fr)}.invoice-bottom{grid-template-columns:1fr}.item-row{grid-template-columns:1.8fr .5fr .6fr .7fr .7fr 36px}.paper{padding:15mm 12mm}}
+@media print{body *{visibility:hidden}.paper,.paper *{visibility:visible}.paper{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0;margin:0;padding:15mm}.modal-actions,.modal-head{display:none!important}}
+.customer-card.clickable{cursor:pointer;border-radius:12px;padding:15px 12px;margin:0 -8px;transition:.15s ease}
+.customer-card.clickable:hover{background:#f8fafc}
+.customer-actions{display:flex;gap:12px;align-items:center}
+.customer-detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.customer-profile{display:flex;justify-content:space-between;gap:30px;align-items:flex-start;margin-bottom:20px}
+.customer-profile h2{font-size:24px;margin:5px 0 6px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:var(--muted)}
+.customer-detail-metrics{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:12px;min-width:480px}
+.customer-detail-metrics>div{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:6px}
+.customer-detail-metrics span{font-size:12px;color:var(--muted);font-weight:650}.customer-detail-metrics strong{font-size:18px}
+@media(max-width:980px){.customer-profile{display:grid}.customer-detail-metrics{min-width:0;grid-template-columns:1fr}.customer-detail-head{gap:10px;align-items:stretch}.customer-detail-head button{flex:1}}
+
+
+/* InvoiceAssist 0.4 – E-Rechnungsdienst */
+.space-top{margin-top:18px}
+.api-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+.subtle-box{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--muted);font-size:13px;line-height:1.55}
+.check-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;color:var(--text);font-size:14px}
+.check-list>div{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fafafa}
+.badge.error{background:#fff1f2;color:#be123c}
+.export-actions{justify-content:space-between;gap:16px;flex-wrap:wrap}
+.export-group{display:flex;gap:8px;flex-wrap:wrap}
+.ebtn{border-color:#cbd5e1}
+.export-message{margin-top:12px;border-radius:10px;padding:11px 13px;font-size:13px;background:#f8fafc;border:1px solid var(--border);color:var(--muted)}
+.export-message.success{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.export-message.error{background:#fff1f2;border-color:#fecdd3;color:#be123c}
+@media(max-width:760px){.check-list{grid-template-columns:1fr}.api-actions{justify-content:stretch}.api-actions button{flex:1}}
+
+.einvoice-fields{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:14px}.field-help{font-size:12px;color:var(--muted);margin-top:8px}.export-check{margin-top:10px;padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid var(--border);font-size:13px}.export-check strong{display:block;margin-bottom:6px}.export-check .ok{color:#15803d}.export-check .bad{color:#b91c1c}
+
+/* 0.6.9 – Rechnungsvorschau entspricht dem PDF-Kopf/-Fuß */
+.paper{position:relative;padding-bottom:55mm}
+.paper .paper-header{display:flex;justify-content:space-between;align-items:flex-start;gap:35px}
+.paper .invoice-logo{display:block;width:54mm;max-height:28mm;object-fit:contain;object-position:right top;margin-top:-5mm}
+.paper .project-line{margin-top:7px;color:#6b7280}
+.paper .paper-office-footer{position:absolute;left:20mm;right:20mm;bottom:15mm;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6mm;color:#777b82;font-size:7.2px;line-height:1.45}
+.paper .paper-office-footer>div{min-width:0}
+
+@media print{
+  @page{size:A4;margin:0}
+  .paper{width:210mm;min-height:297mm;padding:18mm 16mm 52mm!important;box-shadow:none;border:0;margin:0;position:absolute;left:0;top:0}
+  .paper .invoice-logo{width:50mm;max-height:26mm;margin-top:-4mm}
+  .paper .paper-office-footer{left:16mm;right:16mm;bottom:13mm;font-size:7px;gap:5mm}
+}
+
+/* 0.7.0 – Kunden/Projekte, Schlussrechnungen, Textbausteine und Stunden */
+.customer-project-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+.project-card{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:15px 6px;border-bottom:1px solid var(--line)}
+.project-card:last-child{border-bottom:0}.project-name{font-weight:780}
+.intro-builder{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fbfcfe}
+.intro-builder-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:12px}
+.intro-builder h3,.prepaid-section h3,.items-head h3{margin:0;font-size:15px}.intro-builder p,.prepaid-section p,.items-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.compact-label{min-width:300px}.item-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.prepaid-section{margin-top:18px;border:1px solid #dbe5f0;border-radius:14px;background:#f8fbff;overflow:hidden}
+.prepaid-section .items-head{border-bottom:1px solid #dbe5f0}.prepaid-row{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid #e6edf5;font-weight:400;color:var(--text)}
+.prepaid-row:last-child{border-bottom:0}.prepaid-row input{width:auto}.prepaid-row span{display:grid;gap:2px}.prepaid-row small{color:var(--muted)}
+.prepaid-total{display:flex;justify-content:flex-end;gap:22px;padding:12px 16px;background:#f1f6fb;font-size:13px}.small-empty{padding:18px}
+.paper .paper-intro{margin-top:24px;font-size:12px;line-height:1.6;white-space:pre-wrap}
+.paper .paper-prepaid-title{font-size:10px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb}
+.paper .paper-prepaid{font-size:10px;color:#6b7280}.paper table small{color:#8a9099}
+@media(max-width:980px){.customer-project-grid{grid-template-columns:1fr}.intro-builder-head{display:grid}.compact-label{min-width:0}}
+
+/* 0.7.1 – Kundenbearbeitung und HOAI-Baustein */
+.customer-head-actions{display:flex;gap:10px;align-items:center}
+.narrow-card{width:min(620px,100%)}
+.hoai-card{width:min(1040px,100%)}
+.hoai-warning{padding:12px 14px;border:1px solid #f1d7a8;background:#fffaf0;border-radius:12px;color:#75531a;font-size:12px;line-height:1.55}
+.hoai-phases{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.hoai-phase-row{display:grid;grid-template-columns:36px 1fr 150px;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.hoai-phase-row:last-child{border-bottom:0}.hoai-phase-row input[type="checkbox"]{width:auto}.hoai-phase-row input[type="number"]{max-width:140px}
+.hoai-result{margin:18px 0 0 auto;width:min(420px,100%);border:1px solid var(--line);border-radius:14px;padding:12px 16px;background:#f8fafc}
+.hoai-result>div{display:flex;justify-content:space-between;padding:8px 0}.hoai-result>div:last-child{font-size:17px;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.paper .hoai-detail{display:block;color:#7b818b;font-size:9px;line-height:1.35;margin-top:3px;white-space:pre-wrap}
+@media(max-width:760px){.customer-head-actions{display:grid}.hoai-phase-row{grid-template-columns:32px 1fr}.hoai-phase-row input[type="number"]{grid-column:2}.form-grid.four{grid-template-columns:1fr 1fr}}
+
+/* 0.7.2 – Oberfläche nach dem freigegebenen HTML-Prototyp */
+:root{--proto-dark:#171717;--proto-bg:#f3f4f6;--proto-card:#fff;--proto-line:#d9d9d9}
+body{background:var(--proto-bg);color:#171717}
+.app-shell{grid-template-columns:218px 1fr;background:var(--proto-bg)}
+.sidebar{background:var(--proto-dark);border-right:0;padding:22px 11px;color:#fff}
+.brand{padding:0 0 24px 0}.brand-mark,.brand-sub{display:none}.brand-name{font-size:18px;color:#fff;letter-spacing:.2px}
+.nav{gap:4px}.nav-item{border-radius:7px;color:#ddd;padding:10px 11px;font-size:14px}.nav-item:hover,.nav-item.active{background:#2a2a2a;color:#fff}
+.sidebar-foot{color:#999;border-color:#333}.main{padding:22px 20px 36px;max-width:none}.topbar{margin-bottom:16px}.topbar h1{font-size:23px}.topbar p{font-size:12px}
+.panel,.metric-card{border:1px solid var(--proto-line);border-radius:11px;box-shadow:0 1px 2px rgba(0,0,0,.02);background:#fff}
+.primary{background:#171717}.primary:hover{background:#2a2a2a}.ghost{border-color:#cfcfcf;background:#fff;color:#222}
+
+/* Der Rechnungseditor ist jetzt die zentrale Arbeitsfläche: Eingabe links, Rechnung rechts. */
+#invoiceModal{align-items:stretch;padding:12px;background:rgba(17,24,39,.28)}
+#invoiceModal .invoice-editor{width:min(1580px,calc(100vw - 24px));max-width:none;height:calc(100vh - 24px);max-height:none;border-radius:12px;padding:0;overflow:hidden;background:var(--proto-bg)}
+#invoiceModal .modal-head{padding:16px 18px;background:#fff;border-bottom:1px solid var(--proto-line);margin:0}
+#invoiceModal .modal-head h2{font-size:19px;margin:0}#invoiceModal .modal-head p{font-size:11px;margin-top:3px}
+#invoiceModal #invoiceForm{height:calc(100% - 72px);overflow:auto;display:grid;grid-template-columns:minmax(590px,1fr) minmax(470px,560px);column-gap:18px;align-content:start;padding:16px 18px 20px}
+#invoiceModal #invoiceForm>*{grid-column:1;min-width:0}
+#invoiceModal .live-preview-pane{grid-column:2;grid-row:1 / span 30;position:sticky;top:0;align-self:start;min-width:0}
+.live-preview-head{height:30px;display:flex;justify-content:space-between;align-items:center;font-size:13px}.live-preview-head span{font-size:10px;color:#777;font-weight:400}
+.live-preview-scroll{height:calc(100vh - 145px);overflow:auto;padding:0 8px 18px 0}
+#invoiceModal .live-paper{width:100%;min-height:0;aspect-ratio:210/297;padding:8.5% 8% 17%;box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:8px;transform-origin:top center}
+#invoiceModal .live-paper .company{font-size:7.5px;line-height:1.45}#invoiceModal .live-paper .company strong{font-size:8px}
+#invoiceModal .live-paper .invoice-logo{width:34%;max-height:13%;margin-top:-2%}
+#invoiceModal .live-paper .recipient{margin-top:7%;font-size:8px;line-height:1.4}
+#invoiceModal .live-paper .inv-title{margin-top:6%;align-items:flex-start}#invoiceModal .live-paper h1{font-size:18px}
+#invoiceModal .live-paper .project-line{font-size:8px;margin-top:2px}#invoiceModal .live-paper .meta{font-size:7px;line-height:1.55}
+#invoiceModal .live-paper .paper-intro{margin-top:5%;font-size:7.5px;line-height:1.45}
+#invoiceModal .live-paper table{margin-top:4%;font-size:7px}#invoiceModal .live-paper th,#invoiceModal .live-paper td{font-size:7px;padding:5px 3px}#invoiceModal .live-paper th{font-size:6px}
+#invoiceModal .live-paper .paper-total{width:45%;margin-top:3%;font-size:7px}#invoiceModal .live-paper .paper-total div{padding:2px 0}#invoiceModal .live-paper .paper-total .grand{font-size:8px;padding-top:4px}
+#invoiceModal .live-paper .paper-prepaid-title,#invoiceModal .live-paper .paper-prepaid{font-size:6.3px}
+#invoiceModal .live-paper .footer-note{margin-top:6%;font-size:7px;line-height:1.45}
+#invoiceModal .live-paper .paper-office-footer{left:8%;right:8%;bottom:4.5%;gap:3%;font-size:5.1px;line-height:1.35}
+#invoiceModal .form-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}#invoiceModal label{font-size:11px}#invoiceModal input,#invoiceModal select,#invoiceModal textarea{padding:8px 9px;font-size:12px;border-radius:7px}
+#invoiceModal .intro-builder,#invoiceModal .prepaid-section,#invoiceModal .items-wrap,#invoiceModal .totals{border-radius:10px}
+#invoiceModal .intro-builder{padding:13px}#invoiceModal .items-head{padding:12px}#invoiceModal .item-row{padding:8px 10px;gap:7px;grid-template-columns:minmax(220px,2.4fr) .55fr .65fr .8fr .8fr 34px}
+#invoiceModal .invoice-bottom{gap:16px;margin-top:16px;grid-template-columns:1fr 300px}#invoiceModal .modal-actions{margin-top:14px;padding-bottom:2px}
+#invoiceModal .export-message{margin-top:10px}
+
+@media(max-width:1150px){#invoiceModal #invoiceForm{grid-template-columns:1fr}.live-preview-pane{display:none!important}}
+@media print{#invoiceModal .live-preview-pane{display:none!important}}
