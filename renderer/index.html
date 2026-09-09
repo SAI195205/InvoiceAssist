@@ -62,12 +62,12 @@
       <section id="eInvoiceCheck" class="view">
         <div class="panel checker-panel">
           <div class="panel-head"><div><h2>E-Rechnung prüfen</h2><p>XRechnung-XML lokal einlesen und verständlich anzeigen</p></div><span class="badge paid">100 % lokal</span></div>
-          <div class="checker-note"><strong>Keine Übertragung:</strong> Die ausgewählte XML-Datei wird ausschließlich auf diesem PC im Arbeitsspeicher verarbeitet. In Version 0.8.0 erfolgt eine Struktur- und Plausibilitätsprüfung; eine vollständige externe EN-16931-/Schematron-Validierung wird nicht vorgetäuscht.</div>
+          <div class="checker-note"><strong>Keine Übertragung:</strong> Die ausgewählte XML- oder ZUGFeRD-PDF-Datei wird ausschließlich auf diesem PC im Arbeitsspeicher verarbeitet. InvoiceAssist liest bei ZUGFeRD die eingebettete Rechnungs-XML aus. Es erfolgt eine Struktur- und Plausibilitätsprüfung; eine vollständige externe EN-16931-/Schematron-Validierung wird nicht vorgetäuscht.</div>
           <div id="checkerDropzone" class="checker-dropzone" tabindex="0">
-            <div class="checker-drop-icon">XML</div>
+            <div class="checker-drop-icon">XML / PDF</div>
             <div><strong>XRechnung hier hineinziehen</strong><p>oder eine XML-Datei vom PC auswählen</p></div>
             <button type="button" class="primary small" id="checkerChooseBtn">Datei auswählen</button>
-            <input id="checkerFileInput" type="file" accept=".xml,text/xml,application/xml" hidden />
+            <input id="checkerFileInput" type="file" accept=".xml,.pdf,text/xml,application/xml,application/pdf" hidden />
           </div>
           <div id="checkerMessage" class="checker-message" hidden></div>
         </div>

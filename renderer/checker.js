@@ -243,20 +243,66 @@
   function showMessage(message, type = 'info') {
     const box = $('checkerMessage'); box.hidden = false; box.className = `checker-message ${type}`; box.textContent = message;
   }
+
+  async function extractInvoiceXmlFromPdf(file) {
+    let pdfjs;
+    try {
+      pdfjs = await import('../node_modules/pdfjs-dist/legacy/build/pdf.mjs');
+    } catch (e) {
+      throw new Error('Die lokale PDF-Komponente konnte nicht geladen werden. Bitte InvoiceAssist neu bauen.');
+    }
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let pdf;
+    try {
+      const task = pdfjs.getDocument({ data: bytes, useWorkerFetch: false, isEvalSupported: false });
+      pdf = await task.promise;
+    } catch (e) {
+      throw new Error('Die PDF-Datei konnte nicht gelesen werden.');
+    }
+    const attachments = await pdf.getAttachments();
+    if (!attachments || !Object.keys(attachments).length) {
+      throw new Error('In dieser PDF wurde keine eingebettete Datei gefunden. Sie scheint keine ZUGFeRD-/Factur-X-Rechnung zu enthalten.');
+    }
+    const entries = Object.entries(attachments);
+    const preferred = entries.find(([name]) => /^(factur-x|zugferd-invoice)\.xml$/i.test(name))
+      || entries.find(([name]) => /\.xml$/i.test(name));
+    if (!preferred) {
+      throw new Error('Die PDF enthält Anhänge, aber keine eingebettete Rechnungs-XML.');
+    }
+    const [attachmentName, attachment] = preferred;
+    const content = attachment?.content;
+    if (!content) throw new Error('Die eingebettete Rechnungs-XML konnte nicht gelesen werden.');
+    const xml = new TextDecoder('utf-8').decode(content);
+    if (!/<[^>]*(CrossIndustryInvoice|Invoice)\b/i.test(xml)) {
+      throw new Error(`Die eingebettete Datei "${attachmentName}" wurde gefunden, enthält aber keine erkannte Rechnungsstruktur.`);
+    }
+    return { xml, attachmentName };
+  }
+
   async function handleFile(file) {
     $('checkerResult').hidden = true;
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) return showMessage('Die Datei ist größer als 10 MB. Bitte eine normale XRechnung-XML auswählen.', 'error');
-    if (!/\.xml$/i.test(file.name) && !/xml/i.test(file.type || '')) return showMessage('Version 0.8.0 prüft zunächst XRechnung als XML. ZUGFeRD-PDF ergänzen wir separat.', 'warn');
-    showMessage('Datei wird lokal gelesen und geprüft …', 'info');
+    if (file.size > 25 * 1024 * 1024) return showMessage('Die Datei ist größer als 25 MB. Bitte eine normale E-Rechnungsdatei auswählen.', 'error');
+    const isPdf = /\.pdf$/i.test(file.name) || /application\/pdf/i.test(file.type || '');
+    const isXml = /\.xml$/i.test(file.name) || /xml/i.test(file.type || '');
+    if (!isPdf && !isXml) return showMessage('Bitte eine XRechnung-XML oder eine ZUGFeRD-/Factur-X-PDF auswählen.', 'warn');
+    showMessage(isPdf ? 'ZUGFeRD-PDF wird lokal gelesen und die eingebettete XML gesucht …' : 'XML-Datei wird lokal gelesen und geprüft …', 'info');
     try {
-      const xml = await file.text();
+      let xml, embeddedName = '';
+      if (isPdf) {
+        const extracted = await extractInvoiceXmlFromPdf(file);
+        xml = extracted.xml;
+        embeddedName = extracted.attachmentName;
+      } else {
+        xml = await file.text();
+      }
       const data = parseInvoice(xml);
+      if (isPdf) data.format = `ZUGFeRD / Factur-X PDF · ${data.format}`;
       const checks = makeChecks(data);
       renderResult(data, file, checks);
       const errors = checks.filter(x => x.level === 'error').length;
       const warnings = checks.filter(x => x.level === 'warn').length;
-      showMessage(errors ? `Prüfung abgeschlossen: ${errors} Fehler gefunden.` : warnings ? `Prüfung abgeschlossen: plausibel, aber ${warnings} Hinweis${warnings === 1 ? '' : 'e'}.` : 'Prüfung abgeschlossen: keine Auffälligkeiten in der lokalen Strukturprüfung.', errors ? 'error' : warnings ? 'warn' : 'success');
+      showMessage(errors ? `Prüfung abgeschlossen: ${errors} Fehler gefunden.` : warnings ? `Prüfung abgeschlossen: plausibel, aber ${warnings} Hinweis${warnings === 1 ? '' : 'e'}.` : (isPdf ? `ZUGFeRD erkannt: eingebettete XML „${embeddedName}“ ausgelesen. Keine Auffälligkeiten in der lokalen Strukturprüfung.` : 'Prüfung abgeschlossen: keine Auffälligkeiten in der lokalen Strukturprüfung.'), errors ? 'error' : warnings ? 'warn' : 'success');
     } catch (err) {
       showMessage(err?.message || String(err), 'error');
     }
@@ -275,10 +321,10 @@
     <div class="totals"><div><span>Netto</span><strong>${htmlEsc(fmtMoney(data.net))}</strong></div><div><span>Steuer</span><strong>${htmlEsc(fmtMoney(data.tax))}</strong></div><div><span>Brutto</span><strong>${htmlEsc(fmtMoney(data.gross))}</strong></div><div class="grand"><span>Zu zahlen</span><strong>${htmlEsc(fmtMoney(data.dueAmount))}</strong></div></div>
     <div class="box" style="margin-top:8mm"><div class="label">Zahlungsinformation</div><strong>IBAN:</strong> ${htmlEsc(data.iban||'—')} &nbsp;&nbsp; <strong>Währung:</strong> ${htmlEsc(data.currency||'—')}</div>
     <div class="notice"><strong>Hinweis:</strong> Diese PDF-/Druckansicht ist eine von InvoiceAssist erzeugte lesbare Darstellung der strukturierten E-Rechnungsdaten. Sie ersetzt oder verändert die Original-XML-Datei nicht. Für die elektronische Weiterverarbeitung und die darin enthaltenen strukturierten Rechnungsdaten bleibt die Original-XML maßgeblich.</div>
-    <div class="footer">Quelle: ${htmlEsc(file?.name||'XML-Datei')} · lokal mit InvoiceAssist aufbereitet</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));<\/script></body></html>`;
+    <div class="footer">Quelle: ${htmlEsc(file?.name||'E-Rechnungsdatei')} · lokal mit InvoiceAssist aufbereitet</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));<\/script></body></html>`;
   }
   function saveAsPdfView() {
-    if (!currentData) return showMessage('Bitte zuerst eine XRechnung einlesen.', 'warn');
+    if (!currentData) return showMessage('Bitte zuerst eine E-Rechnung einlesen.', 'warn');
     const w = window.open('', '_blank', 'width=1000,height=850');
     if (!w) return showMessage('Die PDF-/Druckansicht konnte nicht geöffnet werden.', 'error');
     w.document.open(); w.document.write(printableInvoice(currentData, currentFile)); w.document.close();
