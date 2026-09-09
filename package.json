@@ -1,6 +1,6 @@
 {
   "name": "invoiceassist-desktop",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Lokale Rechnungs-Desktop-App mit Rechnungserstellung, ZUGFeRD/XRechnung Export und lokalem E-Rechnungs-Prüfer",
   "main": "main.js",
   "author": "InvoiceAssist",
