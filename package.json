@@ -1,7 +1,7 @@
 {
   "name": "invoiceassist-desktop",
-  "version": "0.7.7",
-  "description": "Lokale Rechnungs-Desktop-App mit Kundenbearbeitung, historischen Kundensnapshots, Abschlags-/Schlussrechnungen, HOAI-/Stundenbausteinen sowie ZUGFeRD/XRechnung Export",
+  "version": "0.8.0",
+  "description": "Lokale Rechnungs-Desktop-App mit Rechnungserstellung, ZUGFeRD/XRechnung Export und lokalem E-Rechnungs-Prüfer",
   "main": "main.js",
   "author": "InvoiceAssist",
   "license": "UNLICENSED",
