@@ -224,6 +224,22 @@ function getWindowsSrgbIccProfile(){
 
 async function getFx(){return import('@stackforge-eu/factur-x')}
 
+ipcMain.handle('extract-zugferd-xml',async(_e,pdfBytes)=>{
+  try{
+    const fx=await getFx();
+    const input=pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
+    const result=await fx.extractXml(input);
+    return {
+      ok:true,
+      xml:result.xml,
+      filename:result.filename||'factur-x.xml',
+      profile:result.profile||''
+    };
+  }catch(err){
+    return {ok:false,error:err?.message||String(err)};
+  }
+});
+
 ipcMain.handle('export-zugferd',async(_e,p)=>{
   try{
     // Deutsches ZUGFeRD-XRECHNUNG-Referenzprofil:

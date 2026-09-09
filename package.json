@@ -1,6 +1,6 @@
 {
   "name": "invoiceassist-desktop",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Lokale Rechnungs-Desktop-App mit Rechnungserstellung, ZUGFeRD/XRechnung Export und lokalem E-Rechnungs-Prüfer für XML und ZUGFeRD-PDF",
   "main": "main.js",
   "author": "InvoiceAssist",
@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@stackforge-eu/factur-x": "1.4.0",
-    "pdfkit": "0.17.2",
-    "pdfjs-dist": "5.4.149"
+    "pdfkit": "0.17.2"
   },
   "devDependencies": {
     "electron": "44.2.0",
