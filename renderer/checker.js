@@ -1,4 +1,4 @@
-/* InvoiceAssist 0.8.0 – lokaler XRechnung-Prüfer
+/* InvoiceAssist 0.8.1 – lokaler XRechnung-Prüfer
    Eigenständiges Renderer-Modul. Der bestehende Rechnungs-/Exportkern bleibt unberührt. */
 (() => {
   const $ = id => document.getElementById(id);
@@ -39,6 +39,9 @@
   };
   const addr = a => [a?.street, [a?.zip, a?.city].filter(Boolean).join(' '), a?.country].filter(Boolean).join(', ');
   const fmtMoney = n => n === null || n === undefined ? '—' : money.format(n);
+  const unitLabel = code => ({C62:'Stück',HUR:'Stunde',DAY:'Tag',MON:'Monat',KGM:'kg',MTR:'m',MTK:'m²',MTQ:'m³',LTR:'Liter'})[String(code||'').toUpperCase()] || code || '—';
+  let currentData = null;
+  let currentFile = null;
 
   function ublParty(node) {
     const party = first(node, 'Party') || node;
@@ -202,7 +205,7 @@
     setText('checkerPositionMeta', `${lines.length} Position${lines.length === 1 ? '' : 'en'}`);
     for (const x of lines) {
       const tr = document.createElement('tr');
-      const cells = [x.id || '—', x.description || '—', x.quantity === null ? '—' : number.format(x.quantity), x.unit || '—', x.unitPrice === null ? '—' : money.format(x.unitPrice), x.total === null ? '—' : money.format(x.total)];
+      const cells = [x.id || '—', x.description || '—', x.quantity === null ? '—' : number.format(x.quantity), unitLabel(x.unit), x.unitPrice === null ? '—' : money.format(x.unitPrice), x.total === null ? '—' : money.format(x.total)];
       cells.forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if ([2,4,5].includes(i)) td.className = 'num'; tr.appendChild(td); });
       body.appendChild(tr);
     }
@@ -234,6 +237,8 @@
     setText('checkFileInfoName', file.name);
     setText('checkFileSize', file.size < 1024 ? `${file.size} B` : file.size < 1024*1024 ? `${(file.size/1024).toFixed(1)} KB` : `${(file.size/1024/1024).toFixed(2)} MB`);
     renderPositions(data.lines, data.currency);
+    currentData = data; currentFile = file;
+    const pdfBtn = $('checkerPdfBtn'); if (pdfBtn) pdfBtn.disabled = false;
   }
   function showMessage(message, type = 'info') {
     const box = $('checkerMessage'); box.hidden = false; box.className = `checker-message ${type}`; box.textContent = message;
@@ -257,10 +262,33 @@
     }
   }
 
+
+  const htmlEsc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function printableInvoice(data, file) {
+    const rows = (data.lines || []).map(x => `<tr><td>${htmlEsc(x.id||'—')}</td><td>${htmlEsc(x.description||'—')}</td><td class="r">${htmlEsc(x.quantity===null?'—':number.format(x.quantity))}</td><td>${htmlEsc(unitLabel(x.unit))}</td><td class="r">${htmlEsc(x.unitPrice===null?'—':money.format(x.unitPrice))}</td><td class="r">${htmlEsc(x.total===null?'—':money.format(x.total))}</td></tr>`).join('');
+    return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>E-Rechnung ${htmlEsc(data.invoiceNumber||'')}</title><style>
+      @page{size:A4;margin:16mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#111;font-size:10pt;margin:0}h1{font-size:22pt;margin:0 0 4mm}.sub{color:#667085;margin-bottom:8mm}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin:6mm 0}.box{border:1px solid #d7dce3;border-radius:6px;padding:5mm}.label{font-size:8pt;text-transform:uppercase;color:#667085;font-weight:bold;margin-bottom:2mm}.meta{display:grid;grid-template-columns:1fr 1fr;gap:3mm 8mm}.meta div{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:1.5mm 0}table{width:100%;border-collapse:collapse;margin-top:7mm}th,td{padding:2.5mm 2mm;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{font-size:8pt;text-transform:uppercase;color:#667085;background:#f7f7f7}.r{text-align:right;white-space:nowrap}.totals{width:75mm;margin:7mm 0 0 auto}.totals div{display:flex;justify-content:space-between;padding:2mm 0;border-bottom:1px solid #ddd}.totals .grand{font-size:12pt;font-weight:bold;border-top:2px solid #111}.notice{margin-top:12mm;padding:4mm;border:1px solid #d7dce3;background:#f7f8fa;font-size:8.5pt;line-height:1.45}.footer{margin-top:5mm;color:#667085;font-size:8pt}@media print{button{display:none}}
+    </style></head><body><h1>E-Rechnung</h1><div class="sub">Lesbare Darstellung der strukturierten XML-Rechnungsdaten</div>
+    <div class="meta"><div><span>Rechnungsnummer</span><strong>${htmlEsc(data.invoiceNumber||'—')}</strong></div><div><span>Rechnungsdatum</span><strong>${htmlEsc(deDate(data.issueDate))}</strong></div><div><span>Fällig am</span><strong>${htmlEsc(deDate(data.dueDate))}</strong></div><div><span>Käuferreferenz</span><strong>${htmlEsc(data.buyerReference||'—')}</strong></div></div>
+    <div class="grid"><div class="box"><div class="label">Rechnungssteller</div><strong>${htmlEsc(data.seller?.name||'—')}</strong><br>${htmlEsc(addr(data.seller)||'')}</div><div class="box"><div class="label">Rechnungsempfänger</div><strong>${htmlEsc(data.buyer?.name||'—')}</strong><br>${htmlEsc(addr(data.buyer)||'')}</div></div>
+    <table><thead><tr><th>Pos.</th><th>Beschreibung</th><th class="r">Menge</th><th>Einheit</th><th class="r">Einzelpreis</th><th class="r">Gesamt</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="totals"><div><span>Netto</span><strong>${htmlEsc(fmtMoney(data.net))}</strong></div><div><span>Steuer</span><strong>${htmlEsc(fmtMoney(data.tax))}</strong></div><div><span>Brutto</span><strong>${htmlEsc(fmtMoney(data.gross))}</strong></div><div class="grand"><span>Zu zahlen</span><strong>${htmlEsc(fmtMoney(data.dueAmount))}</strong></div></div>
+    <div class="box" style="margin-top:8mm"><div class="label">Zahlungsinformation</div><strong>IBAN:</strong> ${htmlEsc(data.iban||'—')} &nbsp;&nbsp; <strong>Währung:</strong> ${htmlEsc(data.currency||'—')}</div>
+    <div class="notice"><strong>Hinweis:</strong> Diese PDF-/Druckansicht ist eine von InvoiceAssist erzeugte lesbare Darstellung der strukturierten E-Rechnungsdaten. Sie ersetzt oder verändert die Original-XML-Datei nicht. Für die elektronische Weiterverarbeitung und die darin enthaltenen strukturierten Rechnungsdaten bleibt die Original-XML maßgeblich.</div>
+    <div class="footer">Quelle: ${htmlEsc(file?.name||'XML-Datei')} · lokal mit InvoiceAssist aufbereitet</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));<\/script></body></html>`;
+  }
+  function saveAsPdfView() {
+    if (!currentData) return showMessage('Bitte zuerst eine XRechnung einlesen.', 'warn');
+    const w = window.open('', '_blank', 'width=1000,height=850');
+    if (!w) return showMessage('Die PDF-/Druckansicht konnte nicht geöffnet werden.', 'error');
+    w.document.open(); w.document.write(printableInvoice(currentData, currentFile)); w.document.close();
+  }
+
   const input = $('checkerFileInput');
   const drop = $('checkerDropzone');
   const choose = $('checkerChooseBtn');
   if (!input || !drop || !choose) return;
+  const pdfBtn = $('checkerPdfBtn'); if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.addEventListener('click', saveAsPdfView); }
   choose.addEventListener('click', e => { e.stopPropagation(); input.click(); });
   input.addEventListener('change', () => handleFile(input.files?.[0]));
   drop.addEventListener('click', e => { if (e.target !== choose) input.click(); });
