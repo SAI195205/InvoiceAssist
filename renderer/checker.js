@@ -1,4 +1,4 @@
-/* InvoiceAssist 0.8.1 – lokaler XRechnung-Prüfer
+/* InvoiceAssist 0.8.3 – lokaler XRechnung-Prüfer
    Eigenständiges Renderer-Modul. Der bestehende Rechnungs-/Exportkern bleibt unberührt. */
 (() => {
   const $ = id => document.getElementById(id);
@@ -245,38 +245,20 @@
   }
 
   async function extractInvoiceXmlFromPdf(file) {
-    let pdfjs;
-    try {
-      pdfjs = await import('../node_modules/pdfjs-dist/legacy/build/pdf.mjs');
-    } catch (e) {
-      throw new Error('Die lokale PDF-Komponente konnte nicht geladen werden. Bitte InvoiceAssist neu bauen.');
+    if (!window.invoiceAssist?.extractZugferdXml) {
+      throw new Error('Die ZUGFeRD-PDF-Funktion ist in dieser App-Version nicht verfügbar. Bitte InvoiceAssist 0.8.3 vollständig bauen.');
     }
     const bytes = new Uint8Array(await file.arrayBuffer());
-    let pdf;
-    try {
-      const task = pdfjs.getDocument({ data: bytes, useWorkerFetch: false, isEvalSupported: false });
-      pdf = await task.promise;
-    } catch (e) {
-      throw new Error('Die PDF-Datei konnte nicht gelesen werden.');
+    const result = await window.invoiceAssist.extractZugferdXml(bytes);
+    if (!result?.ok) {
+      const detail = String(result?.error || '');
+      if (/embedded|attachment|xml|factur|zugferd|not found|nicht gefunden/i.test(detail)) {
+        throw new Error('In dieser PDF konnte keine eingebettete ZUGFeRD-/Factur-X-Rechnungs-XML gefunden werden.');
+      }
+      throw new Error(`Die PDF konnte nicht als ZUGFeRD-/Factur-X-Rechnung gelesen werden${detail ? `: ${detail}` : '.'}`);
     }
-    const attachments = await pdf.getAttachments();
-    if (!attachments || !Object.keys(attachments).length) {
-      throw new Error('In dieser PDF wurde keine eingebettete Datei gefunden. Sie scheint keine ZUGFeRD-/Factur-X-Rechnung zu enthalten.');
-    }
-    const entries = Object.entries(attachments);
-    const preferred = entries.find(([name]) => /^(factur-x|zugferd-invoice)\.xml$/i.test(name))
-      || entries.find(([name]) => /\.xml$/i.test(name));
-    if (!preferred) {
-      throw new Error('Die PDF enthält Anhänge, aber keine eingebettete Rechnungs-XML.');
-    }
-    const [attachmentName, attachment] = preferred;
-    const content = attachment?.content;
-    if (!content) throw new Error('Die eingebettete Rechnungs-XML konnte nicht gelesen werden.');
-    const xml = new TextDecoder('utf-8').decode(content);
-    if (!/<[^>]*(CrossIndustryInvoice|Invoice)\b/i.test(xml)) {
-      throw new Error(`Die eingebettete Datei "${attachmentName}" wurde gefunden, enthält aber keine erkannte Rechnungsstruktur.`);
-    }
-    return { xml, attachmentName };
+    if (!result.xml) throw new Error('Die eingebettete Rechnungs-XML wurde gefunden, konnte aber nicht ausgelesen werden.');
+    return { xml: result.xml, attachmentName: result.filename || 'factur-x.xml', profile: result.profile || '' };
   }
 
   async function handleFile(file) {
@@ -293,11 +275,12 @@
         const extracted = await extractInvoiceXmlFromPdf(file);
         xml = extracted.xml;
         embeddedName = extracted.attachmentName;
+        var embeddedProfile = extracted.profile || '';
       } else {
         xml = await file.text();
       }
       const data = parseInvoice(xml);
-      if (isPdf) data.format = `ZUGFeRD / Factur-X PDF · ${data.format}`;
+      if (isPdf) data.format = `ZUGFeRD / Factur-X PDF${embeddedProfile ? ` · Profil ${embeddedProfile}` : ''} · ${data.format}`;
       const checks = makeChecks(data);
       renderResult(data, file, checks);
       const errors = checks.filter(x => x.level === 'error').length;
