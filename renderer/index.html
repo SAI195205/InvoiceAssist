@@ -14,6 +14,7 @@
         <button class="nav-item active" data-view="dashboard">⌂ <span>Dashboard</span></button>
         <button class="nav-item" data-view="invoices">▤ <span>Rechnungen</span></button>
         <button class="nav-item" data-view="customers">◎ <span>Kunden & Projekte</span></button>
+        <button class="nav-item" data-view="eInvoiceCheck">✓ <span>E-Rechnung prüfen</span></button>
         <button class="nav-item" data-view="settings">⚙ <span>Einstellungen</span></button>
       </nav>
       <div class="sidebar-foot"><span class="status-dot"></span>Lokal gespeichert</div>
@@ -56,6 +57,56 @@
           <div class="panel compact"><h2>Projekt anlegen</h2><form id="projectForm" class="form-grid one"><label>Projekt / Bauvorhaben<input id="projectName" required placeholder="z. B. Neubau EFH Musterstraße" /></label><label>Interne Notiz<textarea id="projectNote" rows="3" placeholder="optional"></textarea></label><button class="primary" type="submit">Projekt speichern</button></form></div>
         </div>
         <div class="panel space-top"><div class="panel-head"><div><h2>Rechnungen dieses Kunden</h2><p>Abschläge und Schlussrechnungen sind projektbezogen</p></div></div><div id="customerInvoiceList"></div></div>
+      </section>
+
+      <section id="eInvoiceCheck" class="view">
+        <div class="panel checker-panel">
+          <div class="panel-head"><div><h2>E-Rechnung prüfen</h2><p>XRechnung-XML lokal einlesen und verständlich anzeigen</p></div><span class="badge paid">100 % lokal</span></div>
+          <div class="checker-note"><strong>Keine Übertragung:</strong> Die ausgewählte XML-Datei wird ausschließlich auf diesem PC im Arbeitsspeicher verarbeitet. In Version 0.8.0 erfolgt eine Struktur- und Plausibilitätsprüfung; eine vollständige externe EN-16931-/Schematron-Validierung wird nicht vorgetäuscht.</div>
+          <div id="checkerDropzone" class="checker-dropzone" tabindex="0">
+            <div class="checker-drop-icon">XML</div>
+            <div><strong>XRechnung hier hineinziehen</strong><p>oder eine XML-Datei vom PC auswählen</p></div>
+            <button type="button" class="primary small" id="checkerChooseBtn">Datei auswählen</button>
+            <input id="checkerFileInput" type="file" accept=".xml,text/xml,application/xml" hidden />
+          </div>
+          <div id="checkerMessage" class="checker-message" hidden></div>
+        </div>
+
+        <div id="checkerResult" class="checker-result" hidden>
+          <div class="checker-summary-grid">
+            <article class="panel checker-summary"><div class="eyebrow">Erkanntes Format</div><strong id="checkerFormat">—</strong><span id="checkerFileName">—</span></article>
+            <article class="panel checker-summary"><div class="eyebrow">Prüfergebnis</div><strong id="checkerOverall">—</strong><span id="checkerOverallMeta">—</span></article>
+          </div>
+
+          <div class="panel space-top">
+            <div class="panel-head"><div><h2>Prüfübersicht</h2><p>Formale Struktur und wichtige Rechnungsangaben</p></div></div>
+            <div id="checkerChecks" class="checker-checks"></div>
+          </div>
+
+          <div class="panel space-top">
+            <div class="panel-head"><div><h2>Rechnungsdaten</h2><p>Aus der strukturierten XML ausgelesen</p></div></div>
+            <div class="checker-data-grid">
+              <div><span>Rechnungsnummer</span><strong id="checkInvoiceNumber">—</strong></div>
+              <div><span>Rechnungsdatum</span><strong id="checkIssueDate">—</strong></div>
+              <div><span>Fällig am</span><strong id="checkDueDate">—</strong></div>
+              <div><span>Käuferreferenz</span><strong id="checkBuyerReference">—</strong></div>
+              <div><span>Verkäufer</span><strong id="checkSeller">—</strong><small id="checkSellerAddress"></small></div>
+              <div><span>Käufer</span><strong id="checkBuyer">—</strong><small id="checkBuyerAddress"></small></div>
+              <div><span>IBAN</span><strong id="checkIban">—</strong></div>
+              <div><span>Währung</span><strong id="checkCurrency">—</strong></div>
+            </div>
+          </div>
+
+          <div class="panel space-top">
+            <div class="panel-head"><div><h2>Positionen</h2><p id="checkerPositionMeta">0 Positionen</p></div></div>
+            <div class="checker-table-wrap"><table class="checker-table"><thead><tr><th>Pos.</th><th>Beschreibung</th><th class="num">Menge</th><th>Einheit</th><th class="num">Einzelpreis</th><th class="num">Gesamt</th></tr></thead><tbody id="checkerPositions"></tbody></table></div>
+          </div>
+
+          <div class="checker-bottom-grid space-top">
+            <div class="panel"><div class="panel-head"><div><h2>Beträge</h2><p>Werte aus der XML</p></div></div><div class="checker-totals"><div><span>Netto</span><strong id="checkNet">—</strong></div><div><span>Steuer</span><strong id="checkTax">—</strong></div><div><span>Brutto</span><strong id="checkGross">—</strong></div><div class="grand"><span>Zu zahlen</span><strong id="checkDueAmount">—</strong></div></div></div>
+            <div class="panel"><div class="panel-head"><div><h2>Dateiinformation</h2><p>Lokale Verarbeitung</p></div></div><div class="checker-file-info"><div><span>Datei</span><strong id="checkFileInfoName">—</strong></div><div><span>Größe</span><strong id="checkFileSize">—</strong></div><div><span>Verarbeitet</span><strong>lokal, ohne Upload</strong></div></div></div>
+          </div>
+        </div>
       </section>
 
       <section id="settings" class="view">
@@ -127,5 +178,6 @@
   <div class="modal" id="previewModal" aria-hidden="true"><div class="modal-card preview-card"><div class="modal-head"><div><h2>Rechnungsvorschau</h2><p>Diese Darstellung wird beim Drucken verwendet</p></div><button class="icon-btn" id="closePreview">×</button></div><div class="paper" id="invoicePreview"></div><div class="modal-actions"><button class="ghost" id="closePreview2">Schließen</button><button class="primary" id="printInvoice">Drucken / als PDF speichern</button></div></div></div>
 
   <script src="app.js"></script>
+  <script src="checker.js"></script>
 </body>
 </html>

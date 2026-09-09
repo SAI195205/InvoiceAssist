@@ -112,3 +112,38 @@ body{background:var(--proto-bg);color:#171717}
 #previewModal.preview-active{display:flex!important}
 #previewModal.open{display:none!important}
 #previewModal.open.preview-active{display:flex!important}
+
+/* 0.7.7: saubere Rechnungs-Spalten in Vorschau/Druck */
+.paper table{table-layout:fixed}
+.paper table th:nth-child(1),.paper table td:nth-child(1){width:47%}
+.paper table th:nth-child(2),.paper table td:nth-child(2){width:9%;white-space:nowrap}
+.paper table th:nth-child(3),.paper table td:nth-child(3){width:10%;white-space:nowrap}
+.paper table th:nth-child(4),.paper table td:nth-child(4){width:17%;white-space:nowrap}
+.paper table th:nth-child(5),.paper table td:nth-child(5){width:17%;white-space:nowrap}
+.paper table th{overflow-wrap:normal;word-break:normal}
+
+/* 0.8.0 – lokaler E-Rechnungs-Prüfer */
+.checker-panel{max-width:1050px}
+.checker-note{margin:4px 0 18px;padding:13px 15px;border:1px solid #dbe3ec;border-radius:12px;background:#f8fafc;color:#596272;font-size:12.5px;line-height:1.55}
+.checker-dropzone{min-height:190px;border:2px dashed #c9ced6;border-radius:16px;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:11px;padding:28px;cursor:pointer;transition:.15s ease}
+.checker-dropzone:hover,.checker-dropzone.dragging{border-color:#171717;background:#f4f4f4;transform:translateY(-1px)}
+.checker-dropzone:focus{outline:2px solid #171717;outline-offset:3px}
+.checker-drop-icon{width:58px;height:58px;border-radius:14px;background:#171717;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:850;letter-spacing:.06em}
+.checker-dropzone strong{font-size:17px}.checker-dropzone p{margin:4px 0 2px;color:var(--muted);font-size:13px}
+.checker-message{max-width:1050px;margin-top:14px;border:1px solid var(--border);border-radius:11px;padding:11px 13px;font-size:13px;background:#f8fafc;color:#475569}
+.checker-message.success{background:#f0fdf4;border-color:#bbf7d0;color:#166534}.checker-message.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}.checker-message.error{background:#fff1f2;border-color:#fecdd3;color:#be123c}
+.checker-result{max-width:1050px}.checker-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.checker-summary{display:grid;gap:6px;padding:18px}.checker-summary>strong{font-size:19px}.checker-summary>span{font-size:12px;color:var(--muted);word-break:break-word}
+.checker-overall-ok{color:#15803d}.checker-overall-warn{color:#a16207}.checker-overall-error{color:#b91c1c}
+.checker-checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checker-check{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fbfbfb}
+.checker-check-icon{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-weight:850;font-size:13px}
+.checker-check>div{display:grid;gap:3px}.checker-check strong{font-size:13px}.checker-check small{color:var(--muted);line-height:1.4}
+.checker-check.ok .checker-check-icon{background:#dcfce7;color:#166534}.checker-check.warn .checker-check-icon{background:#fef3c7;color:#92400e}.checker-check.error .checker-check-icon{background:#ffe4e6;color:#be123c}
+.checker-data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.checker-data-grid>div,.checker-file-info>div{border:1px solid var(--line);border-radius:11px;padding:12px 13px;display:grid;gap:4px;min-width:0;background:#fbfbfb}
+.checker-data-grid span,.checker-file-info span{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}.checker-data-grid strong,.checker-file-info strong{font-size:13px;overflow-wrap:anywhere}.checker-data-grid small{color:var(--muted);line-height:1.35}
+.checker-table-wrap{overflow:auto}.checker-table{width:100%;border-collapse:collapse;font-size:13px}.checker-table th,.checker-table td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.checker-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;background:#fafafa}.checker-table .num{text-align:right;white-space:nowrap}.checker-table th:nth-child(1){width:6%}.checker-table th:nth-child(2){width:40%}
+.checker-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.checker-totals{display:grid;gap:0}.checker-totals>div{display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid var(--line)}.checker-totals>div:last-child{border-bottom:0}.checker-totals .grand{font-size:16px;padding-top:13px}.checker-file-info{display:grid;gap:9px}
+@media(max-width:900px){.checker-summary-grid,.checker-bottom-grid,.checker-checks{grid-template-columns:1fr}.checker-data-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.checker-data-grid{grid-template-columns:1fr}}
