@@ -1,5 +1,7 @@
-/* InvoiceAssist 0.8.3 – lokaler XRechnung-Prüfer
-   Eigenständiges Renderer-Modul. Der bestehende Rechnungs-/Exportkern bleibt unberührt. */
+/* InvoiceAssist 0.8.3 – lokaler XRechnungs-/ZUGFeRD-Prüfer
+   Bugfix: bereits gezahlte Beträge (BT-113) werden aus UBL/CII gelesen
+   und in der lesbaren PDF-/Druckansicht nachvollziehbar dargestellt.
+   Der bestehende Rechnungs-/Exportkern bleibt unberührt. */
 (() => {
   const $ = id => document.getElementById(id);
   const money = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
@@ -95,6 +97,7 @@
       net: amount(firstText(monetary, 'TaxExclusiveAmount') || firstText(monetary, 'LineExtensionAmount')),
       tax: amount(firstText(taxTotal, 'TaxAmount')),
       gross: amount(firstText(monetary, 'TaxInclusiveAmount')),
+      prepaidAmount: amount(firstText(monetary, 'PrepaidAmount')),
       dueAmount: amount(firstText(monetary, 'PayableAmount')),
       lines
     };
@@ -154,6 +157,7 @@
       net: amount(firstText(summation, 'TaxBasisTotalAmount') || firstText(summation, 'LineTotalAmount')),
       tax: amount(firstText(summation, 'TaxTotalAmount')),
       gross: amount(firstText(summation, 'GrandTotalAmount')),
+      prepaidAmount: amount(firstText(summation, 'TotalPrepaidAmount')),
       dueAmount: amount(firstText(summation, 'DuePayableAmount')),
       lines
     };
@@ -301,7 +305,7 @@
     <div class="meta"><div><span>Rechnungsnummer</span><strong>${htmlEsc(data.invoiceNumber||'—')}</strong></div><div><span>Rechnungsdatum</span><strong>${htmlEsc(deDate(data.issueDate))}</strong></div><div><span>Fällig am</span><strong>${htmlEsc(deDate(data.dueDate))}</strong></div><div><span>Käuferreferenz</span><strong>${htmlEsc(data.buyerReference||'—')}</strong></div></div>
     <div class="grid"><div class="box"><div class="label">Rechnungssteller</div><strong>${htmlEsc(data.seller?.name||'—')}</strong><br>${htmlEsc(addr(data.seller)||'')}</div><div class="box"><div class="label">Rechnungsempfänger</div><strong>${htmlEsc(data.buyer?.name||'—')}</strong><br>${htmlEsc(addr(data.buyer)||'')}</div></div>
     <table><thead><tr><th>Pos.</th><th>Beschreibung</th><th class="r">Menge</th><th>Einheit</th><th class="r">Einzelpreis</th><th class="r">Gesamt</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="totals"><div><span>Netto</span><strong>${htmlEsc(fmtMoney(data.net))}</strong></div><div><span>Steuer</span><strong>${htmlEsc(fmtMoney(data.tax))}</strong></div><div><span>Brutto</span><strong>${htmlEsc(fmtMoney(data.gross))}</strong></div><div class="grand"><span>Zu zahlen</span><strong>${htmlEsc(fmtMoney(data.dueAmount))}</strong></div></div>
+    <div class="totals"><div><span>Netto</span><strong>${htmlEsc(fmtMoney(data.net))}</strong></div><div><span>Steuer</span><strong>${htmlEsc(fmtMoney(data.tax))}</strong></div><div><span>Brutto</span><strong>${htmlEsc(fmtMoney(data.gross))}</strong></div>${data.prepaidAmount !== null && data.prepaidAmount !== undefined && Math.abs(data.prepaidAmount) > 0.0001 ? `<div><span>Bereits gezahlt</span><strong>− ${htmlEsc(fmtMoney(Math.abs(data.prepaidAmount)))}</strong></div>` : ''}<div class="grand"><span>Noch zu zahlen</span><strong>${htmlEsc(fmtMoney(data.dueAmount))}</strong></div></div>
     <div class="box" style="margin-top:8mm"><div class="label">Zahlungsinformation</div><strong>IBAN:</strong> ${htmlEsc(data.iban||'—')} &nbsp;&nbsp; <strong>Währung:</strong> ${htmlEsc(data.currency||'—')}</div>
     <div class="notice"><strong>Hinweis:</strong> Diese PDF-/Druckansicht ist eine von InvoiceAssist erzeugte lesbare Darstellung der strukturierten E-Rechnungsdaten. Sie ersetzt oder verändert die Original-XML-Datei nicht. Für die elektronische Weiterverarbeitung und die darin enthaltenen strukturierten Rechnungsdaten bleibt die Original-XML maßgeblich.</div>
     <div class="footer">Quelle: ${htmlEsc(file?.name||'E-Rechnungsdatei')} · lokal mit InvoiceAssist aufbereitet</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));<\/script></body></html>`;
